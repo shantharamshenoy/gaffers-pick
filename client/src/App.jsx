@@ -146,18 +146,18 @@ async function checkAdminPassword(input) {
 }
 
 const FLAGS = {
-  "Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czechia":"🇨🇿",
-  "Canada":"🇨🇦","Bosnia-Herzegovina":"🇧🇦","Qatar":"🇶🇦","Switzerland":"🇨🇭",
-  "Brazil":"🇧🇷","Morocco":"🇲🇦","Haiti":"🇭🇹","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  "USA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷",
-  "Germany":"🇩🇪","Curaçao":"🇨🇼","Ivory Coast":"🇨🇮","Ecuador":"🇪🇨",
-  "Netherlands":"🇳🇱","Japan":"🇯🇵","Sweden":"🇸🇪","Tunisia":"🇹🇳",
-  "Belgium":"🇧🇪","Egypt":"🇪🇬","Iran":"🇮🇷","New Zealand":"🇳🇿",
-  "Spain":"🇪🇸","Cape Verde":"🇨🇻","Saudi Arabia":"🇸🇦","Uruguay":"🇺🇾",
-  "France":"🇫🇷","Senegal":"🇸🇳","Iraq":"🇮🇶","Norway":"🇳🇴",
-  "Argentina":"🇦🇷","Algeria":"🇩🇿","Austria":"🇦🇹","Jordan":"🇯🇴",
-  "Portugal":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴",
-  "England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦",
+  "Mexico": "🇲🇽", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Czechia": "🇨🇿",
+  "Canada": "🇨🇦", "Bosnia-Herzegovina": "🇧🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭",
+  "Brazil": "🇧🇷", "Morocco": "🇲🇦", "Haiti": "🇭🇹", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "USA": "🇺🇸", "Paraguay": "🇵🇾", "Australia": "🇦🇺", "Türkiye": "🇹🇷",
+  "Germany": "🇩🇪", "Curaçao": "🇨🇼", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨",
+  "Netherlands": "🇳🇱", "Japan": "🇯🇵", "Sweden": "🇸🇪", "Tunisia": "🇹🇳",
+  "Belgium": "🇧🇪", "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿",
+  "Spain": "🇪🇸", "Cape Verde": "🇨🇻", "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾",
+  "France": "🇫🇷", "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴",
+  "Argentina": "🇦🇷", "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴",
+  "Portugal": "🇵🇹", "DR Congo": "🇨🇩", "Uzbekistan": "🇺🇿", "Colombia": "🇨🇴",
+  "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croatia": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦",
 };
 const flag = t => FLAGS[t] || "🏳️";
 
@@ -207,7 +207,7 @@ export default function App() {
   const [newGroupName, setNewGroupName] = useState("");
 
   useEffect(() => {
-    try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch {}
+    try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { }
     fetchResults();
   }, []);
 
@@ -220,14 +220,14 @@ export default function App() {
     try {
       const res = await fetch("/api/results");
       if (res.ok) setResults(await res.json());
-    } catch {}
+    } catch { }
   }
 
   async function fetchAdminGroups() {
     try {
       const res = await fetch("/api/admin/groups", { headers: { "x-admin-password": adminPwd } });
       if (res.ok) setGroups(await res.json());
-    } catch {}
+    } catch { }
   }
 
   async function fetchLeaderboard(code) {
@@ -237,7 +237,7 @@ export default function App() {
         const data = await res.json();
         setLeaderboards(prev => ({ ...prev, [code]: data }));
       }
-    } catch {}
+    } catch { }
   }
 
   // ── JOIN ──
@@ -353,9 +353,17 @@ export default function App() {
               <button style={S.btn()} onClick={() => setScreen("join")}>Join a Group</button>
               <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040" }} onClick={() => setScreen("leaderboard")}>View Leaderboard</button>
             </div>
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+              <button
+                style={{ ...S.btn("ghost"), border: "1px solid #2a3040", fontSize: 13 }}
+                onClick={() => setScreen("join")}
+              >
+                Already joined? Return to your picks →
+              </button>
+            </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
-            {[["72","Group Stage Matches"],["12","Groups"],["48","Nations"],["10","Max Pts Per Match"]].map(([n,l]) => (
+            {[["72", "Group Stage Matches"], ["12", "Groups"], ["48", "Nations"], ["10", "Max Pts Per Match"]].map(([n, l]) => (
               <div key={l} style={{ ...S.card, textAlign: "center" }}>
                 <div style={{ fontSize: 28, fontWeight: 800, color: "#f5c518", fontFamily: "'Georgia',serif" }}>{n}</div>
                 <div style={{ fontSize: 12, color: "#8892a4", marginTop: 4 }}>{l}</div>
@@ -364,7 +372,7 @@ export default function App() {
           </div>
           <div style={{ ...S.card, marginTop: 20 }}>
             <div style={{ fontSize: 12, color: "#f5c518", fontWeight: 700, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Scoring</div>
-            {[["Correct result (W/D/L)","3 pts"],["Exact home score","+2 pts"],["Exact away score","+2 pts"],["Correct goal difference","+2 pts"],["Correct yellow cards","+1 pt"],["Correct red cards","+1 pt"]].map(([l,v]) => (
+            {[["Correct result (W/D/L)", "3 pts"], ["Exact home score", "+2 pts"], ["Exact away score", "+2 pts"], ["Correct goal difference", "+2 pts"], ["Correct yellow cards", "+1 pt"], ["Correct red cards", "+1 pt"]].map(([l, v]) => (
               <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #1a1e2a", fontSize: 13 }}>
                 <span style={{ color: "#c8ccd8" }}>{l}</span>
                 <span style={{ color: "#f5c518", fontWeight: 700 }}>{v}</span>
@@ -381,8 +389,8 @@ export default function App() {
           <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Get your group code from the Gaffer.</p>
           <div style={S.card}>
             {[["Group Code", joinCode, v => setJoinCode(v.toUpperCase()), "GP-ABC12", "text"],
-              ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
-              ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/,"")), "Pick a PIN", "password"]
+            ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
+            ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
             ].map(([lbl, val, set, ph, type]) => (
               <div key={lbl} style={{ marginBottom: 14 }}>
                 <label style={S.label}>{lbl}</label>
@@ -546,19 +554,19 @@ function PredictRow({ match, pick, result, tz, onSave, showToast }) {
       </div>
       <div style={S.matchRow}>
         <span style={S.teamName}>{flag(match.home)} {match.home}</span>
-        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={h} onChange={e => setH(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         <span style={S.vs}>–</span>
-        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={a} onChange={e => setA(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         <span style={S.teamName}>{flag(match.away)} {match.away}</span>
       </div>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟨</span>
-          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={y} onChange={e => setY(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={y} onChange={e => setY(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟥</span>
-          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={r} onChange={e => setR(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={r} onChange={e => setR(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         </div>
         {!locked && (
           <button style={{ ...S.btn("sm"), marginLeft: "auto", background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave} disabled={saving}>
@@ -604,19 +612,19 @@ function AdminMatchRow({ match, result, tz, onSave }) {
       <div style={{ fontSize: 11, color: "#8892a4", marginBottom: 6 }}>{formatKickoff(match.kickoff, tz)} · {match.id}</div>
       <div style={S.matchRow}>
         <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.home)} {match.home}</span>
-        <input style={S.inputSm} value={h} onChange={e => setH(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <input style={S.inputSm} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         <span style={S.vs}>–</span>
-        <input style={S.inputSm} value={a} onChange={e => setA(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <input style={S.inputSm} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.away)} {match.away}</span>
       </div>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 8, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟨</span>
-          <input style={{ ...S.inputSm, width: 44 }} value={y} onChange={e => setY(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44 }} value={y} onChange={e => setY(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟥</span>
-          <input style={{ ...S.inputSm, width: 44 }} value={r} onChange={e => setR(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44 }} value={r} onChange={e => setR(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         </div>
         <button style={{ ...S.btn("sm"), marginLeft: "auto", background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave}>
           {saved ? "✓ Saved" : "Save Result"}
