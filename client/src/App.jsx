@@ -1,0 +1,627 @@
+import { useState, useEffect } from "react";
+
+// ─── MATCH DATA ───────────────────────────────────────────────────────────────
+const GROUPS = {
+  A: { teams: ["Mexico", "South Africa", "South Korea", "Czechia"] },
+  B: { teams: ["Canada", "Bosnia-Herzegovina", "Qatar", "Switzerland"] },
+  C: { teams: ["Brazil", "Morocco", "Haiti", "Scotland"] },
+  D: { teams: ["USA", "Paraguay", "Australia", "Türkiye"] },
+  E: { teams: ["Germany", "Curaçao", "Ivory Coast", "Ecuador"] },
+  F: { teams: ["Netherlands", "Japan", "Sweden", "Tunisia"] },
+  G: { teams: ["Belgium", "Egypt", "Iran", "New Zealand"] },
+  H: { teams: ["Spain", "Cape Verde", "Saudi Arabia", "Uruguay"] },
+  I: { teams: ["France", "Senegal", "Iraq", "Norway"] },
+  J: { teams: ["Argentina", "Algeria", "Austria", "Jordan"] },
+  K: { teams: ["Portugal", "DR Congo", "Uzbekistan", "Colombia"] },
+  L: { teams: ["England", "Croatia", "Ghana", "Panama"] },
+};
+
+const MATCHES = [
+  { id: "A1", group: "A", home: "Mexico", away: "South Africa", kickoff: "2026-06-11T23:00:00Z" },
+  { id: "A2", group: "A", home: "South Korea", away: "Czechia", kickoff: "2026-06-12T02:00:00Z" },
+  { id: "A3", group: "A", home: "Mexico", away: "Czechia", kickoff: "2026-06-16T23:00:00Z" },
+  { id: "A4", group: "A", home: "South Korea", away: "South Africa", kickoff: "2026-06-17T02:00:00Z" },
+  { id: "A5", group: "A", home: "South Africa", away: "Czechia", kickoff: "2026-06-21T23:00:00Z" },
+  { id: "A6", group: "A", home: "Mexico", away: "South Korea", kickoff: "2026-06-21T23:00:00Z" },
+  { id: "B1", group: "B", home: "Canada", away: "Bosnia-Herzegovina", kickoff: "2026-06-12T20:00:00Z" },
+  { id: "B2", group: "B", home: "Qatar", away: "Switzerland", kickoff: "2026-06-12T23:00:00Z" },
+  { id: "B3", group: "B", home: "Canada", away: "Switzerland", kickoff: "2026-06-16T20:00:00Z" },
+  { id: "B4", group: "B", home: "Qatar", away: "Bosnia-Herzegovina", kickoff: "2026-06-17T23:00:00Z" },
+  { id: "B5", group: "B", home: "Bosnia-Herzegovina", away: "Switzerland", kickoff: "2026-06-21T20:00:00Z" },
+  { id: "B6", group: "B", home: "Canada", away: "Qatar", kickoff: "2026-06-21T20:00:00Z" },
+  { id: "C1", group: "C", home: "Brazil", away: "Morocco", kickoff: "2026-06-13T02:00:00Z" },
+  { id: "C2", group: "C", home: "Haiti", away: "Scotland", kickoff: "2026-06-13T20:00:00Z" },
+  { id: "C3", group: "C", home: "Brazil", away: "Scotland", kickoff: "2026-06-17T20:00:00Z" },
+  { id: "C4", group: "C", home: "Morocco", away: "Haiti", kickoff: "2026-06-18T02:00:00Z" },
+  { id: "C5", group: "C", home: "Scotland", away: "Morocco", kickoff: "2026-06-22T20:00:00Z" },
+  { id: "C6", group: "C", home: "Brazil", away: "Haiti", kickoff: "2026-06-22T20:00:00Z" },
+  { id: "D1", group: "D", home: "USA", away: "Paraguay", kickoff: "2026-06-12T23:00:00Z" },
+  { id: "D2", group: "D", home: "Australia", away: "Türkiye", kickoff: "2026-06-13T02:00:00Z" },
+  { id: "D3", group: "D", home: "USA", away: "Türkiye", kickoff: "2026-06-17T02:00:00Z" },
+  { id: "D4", group: "D", home: "Paraguay", away: "Australia", kickoff: "2026-06-18T20:00:00Z" },
+  { id: "D5", group: "D", home: "Australia", away: "USA", kickoff: "2026-06-22T23:00:00Z" },
+  { id: "D6", group: "D", home: "Türkiye", away: "Paraguay", kickoff: "2026-06-22T23:00:00Z" },
+  { id: "E1", group: "E", home: "Germany", away: "Curaçao", kickoff: "2026-06-13T23:00:00Z" },
+  { id: "E2", group: "E", home: "Ivory Coast", away: "Ecuador", kickoff: "2026-06-14T02:00:00Z" },
+  { id: "E3", group: "E", home: "Germany", away: "Ecuador", kickoff: "2026-06-18T23:00:00Z" },
+  { id: "E4", group: "E", home: "Ivory Coast", away: "Curaçao", kickoff: "2026-06-19T02:00:00Z" },
+  { id: "E5", group: "E", home: "Curaçao", away: "Ecuador", kickoff: "2026-06-23T20:00:00Z" },
+  { id: "E6", group: "E", home: "Germany", away: "Ivory Coast", kickoff: "2026-06-23T20:00:00Z" },
+  { id: "F1", group: "F", home: "Netherlands", away: "Japan", kickoff: "2026-06-14T20:00:00Z" },
+  { id: "F2", group: "F", home: "Sweden", away: "Tunisia", kickoff: "2026-06-14T23:00:00Z" },
+  { id: "F3", group: "F", home: "Netherlands", away: "Tunisia", kickoff: "2026-06-19T20:00:00Z" },
+  { id: "F4", group: "F", home: "Sweden", away: "Japan", kickoff: "2026-06-19T23:00:00Z" },
+  { id: "F5", group: "F", home: "Japan", away: "Tunisia", kickoff: "2026-06-23T23:00:00Z" },
+  { id: "F6", group: "F", home: "Netherlands", away: "Sweden", kickoff: "2026-06-23T23:00:00Z" },
+  { id: "G1", group: "G", home: "Belgium", away: "Egypt", kickoff: "2026-06-15T02:00:00Z" },
+  { id: "G2", group: "G", home: "Iran", away: "New Zealand", kickoff: "2026-06-15T20:00:00Z" },
+  { id: "G3", group: "G", home: "Belgium", away: "New Zealand", kickoff: "2026-06-20T02:00:00Z" },
+  { id: "G4", group: "G", home: "Iran", away: "Egypt", kickoff: "2026-06-20T20:00:00Z" },
+  { id: "G5", group: "G", home: "Egypt", away: "New Zealand", kickoff: "2026-06-24T20:00:00Z" },
+  { id: "G6", group: "G", home: "Belgium", away: "Iran", kickoff: "2026-06-24T20:00:00Z" },
+  { id: "H1", group: "H", home: "Spain", away: "Cape Verde", kickoff: "2026-06-15T23:00:00Z" },
+  { id: "H2", group: "H", home: "Saudi Arabia", away: "Uruguay", kickoff: "2026-06-16T02:00:00Z" },
+  { id: "H3", group: "H", home: "Spain", away: "Uruguay", kickoff: "2026-06-20T23:00:00Z" },
+  { id: "H4", group: "H", home: "Saudi Arabia", away: "Cape Verde", kickoff: "2026-06-21T02:00:00Z" },
+  { id: "H5", group: "H", home: "Cape Verde", away: "Uruguay", kickoff: "2026-06-24T23:00:00Z" },
+  { id: "H6", group: "H", home: "Spain", away: "Saudi Arabia", kickoff: "2026-06-24T23:00:00Z" },
+  { id: "I1", group: "I", home: "France", away: "Senegal", kickoff: "2026-06-16T20:00:00Z" },
+  { id: "I2", group: "I", home: "Iraq", away: "Norway", kickoff: "2026-06-17T20:00:00Z" },
+  { id: "I3", group: "I", home: "France", away: "Norway", kickoff: "2026-06-21T20:00:00Z" },
+  { id: "I4", group: "I", home: "Iraq", away: "Senegal", kickoff: "2026-06-22T02:00:00Z" },
+  { id: "I5", group: "I", home: "Senegal", away: "Norway", kickoff: "2026-06-25T20:00:00Z" },
+  { id: "I6", group: "I", home: "France", away: "Iraq", kickoff: "2026-06-25T20:00:00Z" },
+  { id: "J1", group: "J", home: "Argentina", away: "Algeria", kickoff: "2026-06-16T23:00:00Z" },
+  { id: "J2", group: "J", home: "Austria", away: "Jordan", kickoff: "2026-06-17T23:00:00Z" },
+  { id: "J3", group: "J", home: "Argentina", away: "Jordan", kickoff: "2026-06-21T23:00:00Z" },
+  { id: "J4", group: "J", home: "Austria", away: "Algeria", kickoff: "2026-06-22T20:00:00Z" },
+  { id: "J5", group: "J", home: "Algeria", away: "Jordan", kickoff: "2026-06-25T23:00:00Z" },
+  { id: "J6", group: "J", home: "Argentina", away: "Austria", kickoff: "2026-06-25T23:00:00Z" },
+  { id: "K1", group: "K", home: "Portugal", away: "DR Congo", kickoff: "2026-06-18T02:00:00Z" },
+  { id: "K2", group: "K", home: "Uzbekistan", away: "Colombia", kickoff: "2026-06-18T20:00:00Z" },
+  { id: "K3", group: "K", home: "Portugal", away: "Colombia", kickoff: "2026-06-22T23:00:00Z" },
+  { id: "K4", group: "K", home: "Uzbekistan", away: "DR Congo", kickoff: "2026-06-23T02:00:00Z" },
+  { id: "K5", group: "K", home: "DR Congo", away: "Colombia", kickoff: "2026-06-26T20:00:00Z" },
+  { id: "K6", group: "K", home: "Portugal", away: "Uzbekistan", kickoff: "2026-06-26T20:00:00Z" },
+  { id: "L1", group: "L", home: "England", away: "Croatia", kickoff: "2026-06-17T02:00:00Z" },
+  { id: "L2", group: "L", home: "Ghana", away: "Panama", kickoff: "2026-06-19T02:00:00Z" },
+  { id: "L3", group: "L", home: "England", away: "Panama", kickoff: "2026-06-23T02:00:00Z" },
+  { id: "L4", group: "L", home: "Ghana", away: "Croatia", kickoff: "2026-06-24T02:00:00Z" },
+  { id: "L5", group: "L", home: "Croatia", away: "Panama", kickoff: "2026-06-26T23:00:00Z" },
+  { id: "L6", group: "L", home: "England", away: "Ghana", kickoff: "2026-06-26T23:00:00Z" },
+];
+
+const LOCK_MINUTES = 30;
+
+// ─── SCORING ──────────────────────────────────────────────────────────────────
+function calcPoints(pred, result) {
+  if (!pred || !result) return 0;
+  const ph = parseInt(pred.homeScore), pa = parseInt(pred.awayScore);
+  const rh = parseInt(result.homeScore), ra = parseInt(result.awayScore);
+  if (isNaN(ph) || isNaN(pa) || isNaN(rh) || isNaN(ra)) return 0;
+  let pts = 0;
+  const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
+  const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
+  if (predResult === realResult) pts += 3;
+  if (ph === rh) pts += 2;
+  if (pa === ra) pts += 2;
+  if (ph !== rh || pa !== ra) {
+    if ((ph - pa) === (rh - ra)) pts += 2;
+  }
+  if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1;
+  if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1;
+  return pts;
+}
+
+function isLocked(kickoff) {
+  return Date.now() >= new Date(kickoff).getTime() - LOCK_MINUTES * 60 * 1000;
+}
+
+function formatKickoff(kickoff, tz) {
+  try {
+    return new Date(kickoff).toLocaleString("en-GB", {
+      timeZone: tz || "UTC", weekday: "short", month: "short",
+      day: "numeric", hour: "2-digit", minute: "2-digit",
+    });
+  } catch { return new Date(kickoff).toUTCString(); }
+}
+
+function genGroupCode() {
+  return "GP-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+}
+
+async function checkAdminPassword(input) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  // Verify via server so hash stays server-side only
+  const res = await fetch("/api/admin/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: input }),
+  });
+  return res.ok;
+}
+
+const FLAGS = {
+  "Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czechia":"🇨🇿",
+  "Canada":"🇨🇦","Bosnia-Herzegovina":"🇧🇦","Qatar":"🇶🇦","Switzerland":"🇨🇭",
+  "Brazil":"🇧🇷","Morocco":"🇲🇦","Haiti":"🇭🇹","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "USA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷",
+  "Germany":"🇩🇪","Curaçao":"🇨🇼","Ivory Coast":"🇨🇮","Ecuador":"🇪🇨",
+  "Netherlands":"🇳🇱","Japan":"🇯🇵","Sweden":"🇸🇪","Tunisia":"🇹🇳",
+  "Belgium":"🇧🇪","Egypt":"🇪🇬","Iran":"🇮🇷","New Zealand":"🇳🇿",
+  "Spain":"🇪🇸","Cape Verde":"🇨🇻","Saudi Arabia":"🇸🇦","Uruguay":"🇺🇾",
+  "France":"🇫🇷","Senegal":"🇸🇳","Iraq":"🇮🇶","Norway":"🇳🇴",
+  "Argentina":"🇦🇷","Algeria":"🇩🇿","Austria":"🇦🇹","Jordan":"🇯🇴",
+  "Portugal":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴",
+  "England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦",
+};
+const flag = t => FLAGS[t] || "🏳️";
+
+// ─── STYLES ───────────────────────────────────────────────────────────────────
+const S = {
+  app: { minHeight: "100vh", background: "#0a0c10", color: "#e8eaf0", fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 14 },
+  header: { background: "linear-gradient(135deg,#0d1117 0%,#131822 100%)", borderBottom: "1px solid #1e2433", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, flexWrap: "wrap", gap: 8 },
+  logo: { fontFamily: "'Georgia',serif", fontSize: 22, fontWeight: 700, color: "#e8eaf0", letterSpacing: "-0.5px", cursor: "pointer" },
+  logoAccent: { color: "#f5c518" },
+  pill: (active) => ({ padding: "5px 14px", borderRadius: 20, border: `1px solid ${active ? "#f5c518" : "#2a3040"}`, background: active ? "#f5c518" : "transparent", color: active ? "#0a0c10" : "#8892a4", cursor: "pointer", fontSize: 12, fontWeight: 600 }),
+  card: { background: "#111520", border: "1px solid #1e2433", borderRadius: 10, padding: 16, marginBottom: 12 },
+  input: { background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, color: "#e8eaf0", padding: "8px 12px", fontSize: 14, width: "100%", outline: "none", boxSizing: "border-box" },
+  inputSm: { background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, color: "#e8eaf0", padding: "6px 8px", fontSize: 13, width: 52, textAlign: "center", outline: "none" },
+  btn: (v = "primary") => ({ padding: v === "sm" ? "5px 12px" : "9px 20px", borderRadius: 6, border: "none", background: v === "danger" ? "#c0392b" : v === "ghost" ? "transparent" : "#f5c518", color: v === "ghost" ? "#8892a4" : v === "danger" ? "#fff" : "#0a0c10", fontWeight: 700, fontSize: v === "sm" ? 12 : 13, cursor: "pointer" }),
+  label: { fontSize: 11, color: "#8892a4", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4, display: "block" },
+  badge: (c) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: c === "green" ? "#0d2818" : c === "yellow" ? "#2a2200" : c === "red" ? "#2a0d0d" : "#1a1e2a", color: c === "green" ? "#2ecc71" : c === "yellow" ? "#f5c518" : c === "red" ? "#e74c3c" : "#8892a4", border: `1px solid ${c === "green" ? "#1a5c33" : c === "yellow" ? "#5a4400" : c === "red" ? "#5a1a1a" : "#2a3040"}` }),
+  section: { maxWidth: 760, margin: "0 auto", padding: "24px 16px" },
+  groupTab: (active) => ({ padding: "6px 12px", border: `1px solid ${active ? "#f5c518" : "#2a3040"}`, background: active ? "#2a2200" : "transparent", color: active ? "#f5c518" : "#8892a4", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600, margin: "0 3px 6px 0" }),
+  matchRow: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  teamName: { fontSize: 13, fontWeight: 600, flex: 1, minWidth: 80 },
+  vs: { color: "#8892a4", fontSize: 11, fontWeight: 700, width: 20, textAlign: "center" },
+  ptsBadge: (pts) => ({ display: "inline-block", minWidth: 28, textAlign: "center", padding: "2px 6px", borderRadius: 4, fontWeight: 700, fontSize: 12, background: pts >= 8 ? "#0d2818" : pts >= 5 ? "#2a2200" : pts > 0 ? "#1a1e2a" : "#111520", color: pts >= 8 ? "#2ecc71" : pts >= 5 ? "#f5c518" : pts > 0 ? "#8892a4" : "#3a4050", border: `1px solid ${pts >= 8 ? "#1a5c33" : pts >= 5 ? "#5a4400" : "#2a3040"}` }),
+};
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+export default function App() {
+  const [screen, setScreen] = useState("home");
+  const [tz, setTz] = useState("UTC");
+  const [results, setResults] = useState({});
+  const [picks, setPicks] = useState({});
+  const [groups, setGroups] = useState([]);
+  const [leaderboards, setLeaderboards] = useState({});
+  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [adminMode, setAdminMode] = useState(false);
+  const [adminPwd, setAdminPwd] = useState("");
+  const [activeGroup, setActiveGroup] = useState("A");
+  const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Join form
+  const [joinCode, setJoinCode] = useState("");
+  const [joinName, setJoinName] = useState("");
+  const [joinPin, setJoinPin] = useState("");
+  const [joinError, setJoinError] = useState("");
+
+  // Admin create group
+  const [newGroupName, setNewGroupName] = useState("");
+
+  useEffect(() => {
+    try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch {}
+    fetchResults();
+  }, []);
+
+  function showToast(msg, type = "info") {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 2800);
+  }
+
+  async function fetchResults() {
+    try {
+      const res = await fetch("/api/results");
+      if (res.ok) setResults(await res.json());
+    } catch {}
+  }
+
+  async function fetchAdminGroups() {
+    try {
+      const res = await fetch("/api/admin/groups", { headers: { "x-admin-password": adminPwd } });
+      if (res.ok) setGroups(await res.json());
+    } catch {}
+  }
+
+  async function fetchLeaderboard(code) {
+    try {
+      const res = await fetch(`/api/leaderboard/${code}`);
+      if (res.ok) {
+        const data = await res.json();
+        setLeaderboards(prev => ({ ...prev, [code]: data }));
+      }
+    } catch {}
+  }
+
+  // ── JOIN ──
+  async function handleJoin() {
+    setJoinError("");
+    const code = joinCode.trim().toUpperCase();
+    const name = joinName.trim();
+    const pin = joinPin.trim();
+    if (!code || !name || pin.length < 4) { setJoinError("Enter group code, name, and a 4-digit PIN."); return; }
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/groups/${code}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, pin }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setJoinError(data.error || "Something went wrong."); setLoading(false); return; }
+
+      // Fetch picks
+      const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(name)}?pin=${pin}`);
+      if (pRes.ok) setPicks(await pRes.json());
+
+      setCurrentPlayer({ name, pin, groupCode: code, groupName: data.group.name });
+      setScreen("predict");
+      showToast(`Welcome, ${name}!`, "success");
+    } catch { setJoinError("Network error. Try again."); }
+    setLoading(false);
+  }
+
+  // ── SAVE PICK ──
+  async function savePick(matchId, pred) {
+    if (!currentPlayer) return;
+    if (isLocked(MATCHES.find(m => m.id === matchId)?.kickoff)) { showToast("Match locked.", "warn"); return; }
+    try {
+      const res = await fetch("/api/picks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupCode: currentPlayer.groupCode, playerName: currentPlayer.name, pin: currentPlayer.pin, matchId, ...pred }),
+      });
+      if (!res.ok) { showToast("Failed to save.", "warn"); return; }
+      setPicks(prev => ({ ...prev, [matchId]: pred }));
+    } catch { showToast("Network error.", "warn"); }
+  }
+
+  // ── ADMIN: Create group ──
+  async function handleCreateGroup() {
+    if (!newGroupName.trim()) return;
+    const code = genGroupCode();
+    try {
+      const res = await fetch("/api/admin/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPwd },
+        body: JSON.stringify({ code, name: newGroupName.trim() }),
+      });
+      if (res.ok) {
+        showToast(`Group created! Code: ${code}`, "success");
+        setNewGroupName("");
+        fetchAdminGroups();
+      }
+    } catch { showToast("Network error.", "warn"); }
+  }
+
+  // ── ADMIN: Save result ──
+  async function saveResult(matchId, result) {
+    try {
+      const res = await fetch(`/api/admin/results/${matchId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPwd },
+        body: JSON.stringify(result),
+      });
+      if (res.ok) { fetchResults(); showToast("Result saved!", "success"); }
+      else showToast("Failed to save result.", "warn");
+    } catch { showToast("Network error.", "warn"); }
+  }
+
+  return (
+    <div style={S.app}>
+      {/* HEADER */}
+      <div style={S.header}>
+        <div style={S.logo} onClick={() => setScreen("home")}>
+          The <span style={S.logoAccent}>Gaffer's</span> Pick
+          <span style={{ fontSize: 10, color: "#8892a4", marginLeft: 8, fontFamily: "sans-serif", fontWeight: 400 }}>WC 2026</span>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          {currentPlayer && <span style={{ fontSize: 12, color: "#8892a4" }}>👤 {currentPlayer.name}</span>}
+          {currentPlayer && <button style={S.pill(screen === "predict")} onClick={() => setScreen("predict")}>Picks</button>}
+          <button style={S.pill(screen === "leaderboard")} onClick={() => { setScreen("leaderboard"); Object.keys(leaderboards).forEach(fetchLeaderboard); }}>Board</button>
+          {adminMode
+            ? <button style={S.pill(screen === "admin")} onClick={() => { setScreen("admin"); fetchAdminGroups(); }}>Admin</button>
+            : <button style={S.pill(false)} onClick={() => setScreen("adminLogin")}>⚙</button>}
+          {!currentPlayer && <button style={S.pill(screen === "join")} onClick={() => setScreen("join")}>Join</button>}
+        </div>
+      </div>
+
+      {/* TOAST */}
+      {toast && (
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: toast.type === "success" ? "#0d2818" : toast.type === "warn" ? "#2a2200" : "#131822", border: `1px solid ${toast.type === "success" ? "#1a5c33" : toast.type === "warn" ? "#5a4400" : "#2a3040"}`, color: toast.type === "success" ? "#2ecc71" : toast.type === "warn" ? "#f5c518" : "#e8eaf0", padding: "10px 20px", borderRadius: 8, fontSize: 13, fontWeight: 600, zIndex: 999, whiteSpace: "nowrap" }}>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* HOME */}
+      {screen === "home" && (
+        <div style={S.section}>
+          <div style={{ textAlign: "center", padding: "48px 0 32px" }}>
+            <div style={{ fontSize: 56, marginBottom: 12 }}>⚽</div>
+            <h1 style={{ fontFamily: "'Georgia',serif", fontSize: 36, fontWeight: 700, margin: "0 0 8px" }}>
+              The <span style={{ color: "#f5c518" }}>Gaffer's</span> Pick
+            </h1>
+            <p style={{ color: "#8892a4", fontSize: 15, margin: "0 0 32px" }}>World Cup 2026 · Group Stage Predictor</p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <button style={S.btn()} onClick={() => setScreen("join")}>Join a Group</button>
+              <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040" }} onClick={() => setScreen("leaderboard")}>View Leaderboard</button>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+            {[["72","Group Stage Matches"],["12","Groups"],["48","Nations"],["10","Max Pts Per Match"]].map(([n,l]) => (
+              <div key={l} style={{ ...S.card, textAlign: "center" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "#f5c518", fontFamily: "'Georgia',serif" }}>{n}</div>
+                <div style={{ fontSize: 12, color: "#8892a4", marginTop: 4 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...S.card, marginTop: 20 }}>
+            <div style={{ fontSize: 12, color: "#f5c518", fontWeight: 700, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Scoring</div>
+            {[["Correct result (W/D/L)","3 pts"],["Exact home score","+2 pts"],["Exact away score","+2 pts"],["Correct goal difference","+2 pts"],["Correct yellow cards","+1 pt"],["Correct red cards","+1 pt"]].map(([l,v]) => (
+              <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #1a1e2a", fontSize: 13 }}>
+                <span style={{ color: "#c8ccd8" }}>{l}</span>
+                <span style={{ color: "#f5c518", fontWeight: 700 }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* JOIN */}
+      {screen === "join" && (
+        <div style={S.section}>
+          <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 4 }}>Join a Group</h2>
+          <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Get your group code from the Gaffer.</p>
+          <div style={S.card}>
+            {[["Group Code", joinCode, v => setJoinCode(v.toUpperCase()), "GP-ABC12", "text"],
+              ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
+              ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/,"")), "Pick a PIN", "password"]
+            ].map(([lbl, val, set, ph, type]) => (
+              <div key={lbl} style={{ marginBottom: 14 }}>
+                <label style={S.label}>{lbl}</label>
+                <input style={S.input} type={type} placeholder={ph} value={val} onChange={e => set(e.target.value)} maxLength={lbl.includes("PIN") ? 6 : 50} />
+              </div>
+            ))}
+            {joinError && <div style={{ color: "#e74c3c", fontSize: 13, marginBottom: 10 }}>{joinError}</div>}
+            <button style={S.btn()} onClick={handleJoin} disabled={loading}>{loading ? "Joining…" : "Enter the Gaffer's Pick →"}</button>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN LOGIN */}
+      {screen === "adminLogin" && (
+        <div style={S.section}>
+          <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Admin Access</h2>
+          <div style={S.card}>
+            <label style={S.label}>Password</label>
+            <input style={{ ...S.input, marginBottom: 12 }} type="password" value={adminPwd} onChange={e => setAdminPwd(e.target.value)} placeholder="Admin password" />
+            <button style={S.btn()} onClick={async () => {
+              const ok = await checkAdminPassword(adminPwd);
+              if (ok) { setAdminMode(true); setScreen("admin"); fetchAdminGroups(); }
+              else showToast("Wrong password.", "warn");
+            }}>Unlock Admin</button>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN */}
+      {screen === "admin" && adminMode && (
+        <div style={S.section}>
+          <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Admin Panel</h2>
+          <div style={S.card}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#f5c518", marginBottom: 12 }}>CREATE GROUP</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input style={{ ...S.input, flex: 1 }} placeholder="Group name (e.g. Office League)" value={newGroupName} onChange={e => setNewGroupName(e.target.value)} />
+              <button style={S.btn()} onClick={handleCreateGroup}>Create</button>
+            </div>
+          </div>
+          {groups.map(g => (
+            <div key={g.code} style={S.card}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ fontWeight: 700 }}>{g.name}</span>
+                <span style={S.badge("yellow")}>{g.code}</span>
+              </div>
+              <div style={{ fontSize: 12, color: "#8892a4" }}>
+                {g.players?.length || 0} players · Share code: <strong style={{ color: "#f5c518" }}>{g.code}</strong>
+              </div>
+            </div>
+          ))}
+          <div style={{ marginTop: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#f5c518", marginBottom: 12 }}>ENTER RESULTS</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+              {Object.keys(GROUPS).map(g => (
+                <button key={g} style={S.groupTab(activeGroup === g)} onClick={() => setActiveGroup(g)}>Group {g}</button>
+              ))}
+            </div>
+            {MATCHES.filter(m => m.group === activeGroup).map(m => (
+              <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* PREDICT */}
+      {screen === "predict" && currentPlayer && (
+        <div style={S.section}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+            <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 20, margin: 0 }}>Your Picks — {currentPlayer.groupName}</h2>
+            <span style={{ fontSize: 12, color: "#8892a4" }}>Locked 30 min before kickoff</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
+            {Object.keys(GROUPS).map(g => (
+              <button key={g} style={S.groupTab(activeGroup === g)} onClick={() => setActiveGroup(g)}>Group {g}</button>
+            ))}
+          </div>
+          {MATCHES.filter(m => m.group === activeGroup).map(m => (
+            <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />
+          ))}
+        </div>
+      )}
+
+      {/* LEADERBOARD */}
+      {screen === "leaderboard" && (
+        <div style={S.section}>
+          <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Leaderboard</h2>
+          {adminMode && groups.length === 0 && <div style={{ color: "#8892a4", fontSize: 14 }}>No groups yet. Create one in admin.</div>}
+          {!adminMode && Object.keys(leaderboards).length === 0 && (
+            <div style={S.card}>
+              <p style={{ color: "#8892a4", fontSize: 14, margin: 0 }}>Enter your group code to see your leaderboard.</p>
+              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                <input style={{ ...S.input, flex: 1 }} placeholder="Group code (GP-XXXXX)" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} />
+                <button style={S.btn()} onClick={async () => {
+                  await fetchLeaderboard(joinCode.trim());
+                }}>Load</button>
+              </div>
+            </div>
+          )}
+          {Object.entries(leaderboards).map(([code, board]) => (
+            <div key={code} style={{ ...S.card, marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <span style={{ fontWeight: 700, fontSize: 16 }}>{groups.find(g => g.code === code)?.name || code}</span>
+                <span style={S.badge("yellow")}>{code}</span>
+              </div>
+              {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
+              {board.map((p, i) => (
+                <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
+                  <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: i === 0 ? "#f5c518" : i === 1 ? "#c0c0c0" : i === 2 ? "#cd7f32" : "#8892a4" }}>
+                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+                  </span>
+                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
+                  <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
+                  <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── PREDICT ROW ──────────────────────────────────────────────────────────────
+function PredictRow({ match, pick, result, tz, onSave, showToast }) {
+  const locked = isLocked(match.kickoff);
+  const [h, setH] = useState(pick?.homeScore ?? "");
+  const [a, setA] = useState(pick?.awayScore ?? "");
+  const [y, setY] = useState(pick?.yellows ?? "");
+  const [r, setR] = useState(pick?.reds ?? "");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setH(pick?.homeScore ?? "");
+    setA(pick?.awayScore ?? "");
+    setY(pick?.yellows ?? "");
+    setR(pick?.reds ?? "");
+  }, [pick]);
+
+  async function handleSave() {
+    if (locked) { showToast("Match is locked!", "warn"); return; }
+    if (h === "" || a === "") { showToast("Enter both scores first.", "warn"); return; }
+    setSaving(true);
+    await onSave({ homeScore: parseInt(h), awayScore: parseInt(a), yellows: y !== "" ? parseInt(y) : null, reds: r !== "" ? parseInt(r) : null });
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+
+  const pts = result && pick && pick.homeScore != null ? calcPoints(pick, result) : null;
+
+  return (
+    <div style={{ ...S.card, opacity: locked && !pick ? 0.65 : 1 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 4 }}>
+        <span style={{ fontSize: 11, color: "#8892a4" }}>{formatKickoff(match.kickoff, tz)}</span>
+        <div style={{ display: "flex", gap: 6 }}>
+          {locked && <span style={S.badge("red")}>Locked</span>}
+          {pts !== null && <span style={S.ptsBadge(pts)}>{pts} pts</span>}
+        </div>
+      </div>
+      <div style={S.matchRow}>
+        <span style={S.teamName}>{flag(match.home)} {match.home}</span>
+        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={h} onChange={e => setH(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <span style={S.vs}>–</span>
+        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={a} onChange={e => setA(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <span style={S.teamName}>{flag(match.away)} {match.away}</span>
+      </div>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11, color: "#8892a4" }}>🟨</span>
+          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={y} onChange={e => setY(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11, color: "#8892a4" }}>🟥</span>
+          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={r} onChange={e => setR(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        </div>
+        {!locked && (
+          <button style={{ ...S.btn("sm"), marginLeft: "auto", background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave} disabled={saving}>
+            {saving ? "Saving…" : saved ? "✓ Saved" : "Save Pick"}
+          </button>
+        )}
+      </div>
+      {result && (
+        <div style={{ marginTop: 8, fontSize: 12, color: "#8892a4", borderTop: "1px solid #1a1e2a", paddingTop: 8 }}>
+          Result: <strong style={{ color: "#e8eaf0" }}>{match.home} {result.homeScore}–{result.awayScore} {match.away}</strong>
+          {result.yellows != null && <> · 🟨 {result.yellows}</>}
+          {result.reds != null && <> · 🟥 {result.reds}</>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── ADMIN MATCH ROW ──────────────────────────────────────────────────────────
+function AdminMatchRow({ match, result, tz, onSave }) {
+  const [h, setH] = useState(result?.homeScore ?? "");
+  const [a, setA] = useState(result?.awayScore ?? "");
+  const [y, setY] = useState(result?.yellows ?? "");
+  const [r, setR] = useState(result?.reds ?? "");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setH(result?.homeScore ?? "");
+    setA(result?.awayScore ?? "");
+    setY(result?.yellows ?? "");
+    setR(result?.reds ?? "");
+  }, [result]);
+
+  async function handleSave() {
+    if (h === "" || a === "") return;
+    await onSave({ homeScore: parseInt(h), awayScore: parseInt(a), yellows: y !== "" ? parseInt(y) : null, reds: r !== "" ? parseInt(r) : null });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+
+  return (
+    <div style={{ ...S.card, marginBottom: 8 }}>
+      <div style={{ fontSize: 11, color: "#8892a4", marginBottom: 6 }}>{formatKickoff(match.kickoff, tz)} · {match.id}</div>
+      <div style={S.matchRow}>
+        <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.home)} {match.home}</span>
+        <input style={S.inputSm} value={h} onChange={e => setH(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <span style={S.vs}>–</span>
+        <input style={S.inputSm} value={a} onChange={e => setA(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.away)} {match.away}</span>
+      </div>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11, color: "#8892a4" }}>🟨</span>
+          <input style={{ ...S.inputSm, width: 44 }} value={y} onChange={e => setY(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11, color: "#8892a4" }}>🟥</span>
+          <input style={{ ...S.inputSm, width: 44 }} value={r} onChange={e => setR(e.target.value.replace(/\D/,""))} placeholder="0" maxLength={2} />
+        </div>
+        <button style={{ ...S.btn("sm"), marginLeft: "auto", background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave}>
+          {saved ? "✓ Saved" : "Save Result"}
+        </button>
+      </div>
+    </div>
+  );
+}
