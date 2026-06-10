@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "buildCommand = "npm install && cd client && npm install && npm run build && cd .."
+buildCommand = "npm install && cd client && npm install && npm run build && cd .."
 
 [deploy]
 startCommand = "npm start"
