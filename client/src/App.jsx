@@ -17,78 +17,78 @@ const GROUPS = {
 };
 
 const MATCHES = [
-  { id: "A1", group: "A", home: "Mexico", away: "South Africa", kickoff: "2026-06-11T23:00:00Z" },
+  { id: "A1", group: "A", home: "Mexico", away: "South Africa", kickoff: "2026-06-11T19:00:00Z" },
   { id: "A2", group: "A", home: "South Korea", away: "Czechia", kickoff: "2026-06-12T02:00:00Z" },
-  { id: "A3", group: "A", home: "Mexico", away: "Czechia", kickoff: "2026-06-16T23:00:00Z" },
-  { id: "A4", group: "A", home: "South Korea", away: "South Africa", kickoff: "2026-06-17T02:00:00Z" },
-  { id: "A5", group: "A", home: "South Africa", away: "Czechia", kickoff: "2026-06-21T23:00:00Z" },
-  { id: "A6", group: "A", home: "Mexico", away: "South Korea", kickoff: "2026-06-21T23:00:00Z" },
-  { id: "B1", group: "B", home: "Canada", away: "Bosnia-Herzegovina", kickoff: "2026-06-12T20:00:00Z" },
-  { id: "B2", group: "B", home: "Qatar", away: "Switzerland", kickoff: "2026-06-12T23:00:00Z" },
-  { id: "B3", group: "B", home: "Canada", away: "Switzerland", kickoff: "2026-06-16T20:00:00Z" },
-  { id: "B4", group: "B", home: "Qatar", away: "Bosnia-Herzegovina", kickoff: "2026-06-17T23:00:00Z" },
-  { id: "B5", group: "B", home: "Bosnia-Herzegovina", away: "Switzerland", kickoff: "2026-06-21T20:00:00Z" },
-  { id: "B6", group: "B", home: "Canada", away: "Qatar", kickoff: "2026-06-21T20:00:00Z" },
-  { id: "C1", group: "C", home: "Brazil", away: "Morocco", kickoff: "2026-06-13T02:00:00Z" },
-  { id: "C2", group: "C", home: "Haiti", away: "Scotland", kickoff: "2026-06-13T20:00:00Z" },
-  { id: "C3", group: "C", home: "Brazil", away: "Scotland", kickoff: "2026-06-17T20:00:00Z" },
-  { id: "C4", group: "C", home: "Morocco", away: "Haiti", kickoff: "2026-06-18T02:00:00Z" },
-  { id: "C5", group: "C", home: "Scotland", away: "Morocco", kickoff: "2026-06-22T20:00:00Z" },
-  { id: "C6", group: "C", home: "Brazil", away: "Haiti", kickoff: "2026-06-22T20:00:00Z" },
-  { id: "D1", group: "D", home: "USA", away: "Paraguay", kickoff: "2026-06-12T23:00:00Z" },
-  { id: "D2", group: "D", home: "Australia", away: "Türkiye", kickoff: "2026-06-13T02:00:00Z" },
-  { id: "D3", group: "D", home: "USA", away: "Türkiye", kickoff: "2026-06-17T02:00:00Z" },
-  { id: "D4", group: "D", home: "Paraguay", away: "Australia", kickoff: "2026-06-18T20:00:00Z" },
-  { id: "D5", group: "D", home: "Australia", away: "USA", kickoff: "2026-06-22T23:00:00Z" },
-  { id: "D6", group: "D", home: "Türkiye", away: "Paraguay", kickoff: "2026-06-22T23:00:00Z" },
-  { id: "E1", group: "E", home: "Germany", away: "Curaçao", kickoff: "2026-06-13T23:00:00Z" },
-  { id: "E2", group: "E", home: "Ivory Coast", away: "Ecuador", kickoff: "2026-06-14T02:00:00Z" },
-  { id: "E3", group: "E", home: "Germany", away: "Ecuador", kickoff: "2026-06-18T23:00:00Z" },
-  { id: "E4", group: "E", home: "Ivory Coast", away: "Curaçao", kickoff: "2026-06-19T02:00:00Z" },
-  { id: "E5", group: "E", home: "Curaçao", away: "Ecuador", kickoff: "2026-06-23T20:00:00Z" },
-  { id: "E6", group: "E", home: "Germany", away: "Ivory Coast", kickoff: "2026-06-23T20:00:00Z" },
-  { id: "F1", group: "F", home: "Netherlands", away: "Japan", kickoff: "2026-06-14T20:00:00Z" },
-  { id: "F2", group: "F", home: "Sweden", away: "Tunisia", kickoff: "2026-06-14T23:00:00Z" },
-  { id: "F3", group: "F", home: "Netherlands", away: "Tunisia", kickoff: "2026-06-19T20:00:00Z" },
-  { id: "F4", group: "F", home: "Sweden", away: "Japan", kickoff: "2026-06-19T23:00:00Z" },
-  { id: "F5", group: "F", home: "Japan", away: "Tunisia", kickoff: "2026-06-23T23:00:00Z" },
-  { id: "F6", group: "F", home: "Netherlands", away: "Sweden", kickoff: "2026-06-23T23:00:00Z" },
-  { id: "G1", group: "G", home: "Belgium", away: "Egypt", kickoff: "2026-06-15T02:00:00Z" },
-  { id: "G2", group: "G", home: "Iran", away: "New Zealand", kickoff: "2026-06-15T20:00:00Z" },
-  { id: "G3", group: "G", home: "Belgium", away: "New Zealand", kickoff: "2026-06-20T02:00:00Z" },
-  { id: "G4", group: "G", home: "Iran", away: "Egypt", kickoff: "2026-06-20T20:00:00Z" },
-  { id: "G5", group: "G", home: "Egypt", away: "New Zealand", kickoff: "2026-06-24T20:00:00Z" },
-  { id: "G6", group: "G", home: "Belgium", away: "Iran", kickoff: "2026-06-24T20:00:00Z" },
-  { id: "H1", group: "H", home: "Spain", away: "Cape Verde", kickoff: "2026-06-15T23:00:00Z" },
-  { id: "H2", group: "H", home: "Saudi Arabia", away: "Uruguay", kickoff: "2026-06-16T02:00:00Z" },
-  { id: "H3", group: "H", home: "Spain", away: "Uruguay", kickoff: "2026-06-20T23:00:00Z" },
-  { id: "H4", group: "H", home: "Saudi Arabia", away: "Cape Verde", kickoff: "2026-06-21T02:00:00Z" },
-  { id: "H5", group: "H", home: "Cape Verde", away: "Uruguay", kickoff: "2026-06-24T23:00:00Z" },
-  { id: "H6", group: "H", home: "Spain", away: "Saudi Arabia", kickoff: "2026-06-24T23:00:00Z" },
+  { id: "A3", group: "A", home: "Mexico", away: "South Korea", kickoff: "2026-06-19T01:00:00Z" },
+  { id: "A4", group: "A", home: "South Africa", away: "Czechia", kickoff: "2026-06-19T01:00:00Z" },
+  { id: "A5", group: "A", home: "Mexico", away: "Czechia", kickoff: "2026-06-25T01:00:00Z" },
+  { id: "A6", group: "A", home: "South Korea", away: "South Africa", kickoff: "2026-06-25T01:00:00Z" },
+  { id: "B1", group: "B", home: "Canada", away: "Bosnia-Herzegovina", kickoff: "2026-06-12T19:00:00Z" },
+  { id: "B2", group: "B", home: "Qatar", away: "Switzerland", kickoff: "2026-06-13T19:00:00Z" },
+  { id: "B3", group: "B", home: "Canada", away: "Qatar", kickoff: "2026-06-17T22:00:00Z" },
+  { id: "B4", group: "B", home: "Bosnia-Herzegovina", away: "Switzerland", kickoff: "2026-06-18T19:00:00Z" },
+  { id: "B5", group: "B", home: "Canada", away: "Switzerland", kickoff: "2026-06-24T01:00:00Z" },
+  { id: "B6", group: "B", home: "Bosnia-Herzegovina", away: "Qatar", kickoff: "2026-06-24T01:00:00Z" },
+  { id: "C1", group: "C", home: "Brazil", away: "Morocco", kickoff: "2026-06-13T22:00:00Z" },
+  { id: "C2", group: "C", home: "Haiti", away: "Scotland", kickoff: "2026-06-14T19:00:00Z" },
+  { id: "C3", group: "C", home: "Brazil", away: "Scotland", kickoff: "2026-06-18T22:00:00Z" },
+  { id: "C4", group: "C", home: "Morocco", away: "Haiti", kickoff: "2026-06-19T19:00:00Z" },
+  { id: "C5", group: "C", home: "Brazil", away: "Haiti", kickoff: "2026-06-24T22:00:00Z" },
+  { id: "C6", group: "C", home: "Scotland", away: "Morocco", kickoff: "2026-06-24T22:00:00Z" },
+  { id: "D1", group: "D", home: "USA", away: "Paraguay", kickoff: "2026-06-13T01:00:00Z" },
+  { id: "D2", group: "D", home: "Australia", away: "Türkiye", kickoff: "2026-06-14T22:00:00Z" },
+  { id: "D3", group: "D", home: "USA", away: "Australia", kickoff: "2026-06-19T22:00:00Z" },
+  { id: "D4", group: "D", home: "Türkiye", away: "Paraguay", kickoff: "2026-06-20T19:00:00Z" },
+  { id: "D5", group: "D", home: "USA", away: "Türkiye", kickoff: "2026-06-26T01:00:00Z" },
+  { id: "D6", group: "D", home: "Paraguay", away: "Australia", kickoff: "2026-06-26T01:00:00Z" },
+  { id: "E1", group: "E", home: "Germany", away: "Curaçao", kickoff: "2026-06-14T01:00:00Z" },
+  { id: "E2", group: "E", home: "Ivory Coast", away: "Ecuador", kickoff: "2026-06-15T19:00:00Z" },
+  { id: "E3", group: "E", home: "Germany", away: "Ivory Coast", kickoff: "2026-06-20T22:00:00Z" },
+  { id: "E4", group: "E", home: "Ecuador", away: "Curaçao", kickoff: "2026-06-21T19:00:00Z" },
+  { id: "E5", group: "E", home: "Germany", away: "Ecuador", kickoff: "2026-06-25T22:00:00Z" },
+  { id: "E6", group: "E", home: "Curaçao", away: "Ivory Coast", kickoff: "2026-06-25T22:00:00Z" },
+  { id: "F1", group: "F", home: "Netherlands", away: "Japan", kickoff: "2026-06-15T01:00:00Z" },
+  { id: "F2", group: "F", home: "Sweden", away: "Tunisia", kickoff: "2026-06-15T22:00:00Z" },
+  { id: "F3", group: "F", home: "Netherlands", away: "Sweden", kickoff: "2026-06-21T01:00:00Z" },
+  { id: "F4", group: "F", home: "Japan", away: "Tunisia", kickoff: "2026-06-20T01:00:00Z" },
+  { id: "F5", group: "F", home: "Netherlands", away: "Tunisia", kickoff: "2026-06-26T22:00:00Z" },
+  { id: "F6", group: "F", home: "Sweden", away: "Japan", kickoff: "2026-06-26T22:00:00Z" },
+  { id: "G1", group: "G", home: "Belgium", away: "Egypt", kickoff: "2026-06-16T19:00:00Z" },
+  { id: "G2", group: "G", home: "Iran", away: "New Zealand", kickoff: "2026-06-16T22:00:00Z" },
+  { id: "G3", group: "G", home: "Belgium", away: "Iran", kickoff: "2026-06-21T22:00:00Z" },
+  { id: "G4", group: "G", home: "New Zealand", away: "Egypt", kickoff: "2026-06-22T19:00:00Z" },
+  { id: "G5", group: "G", home: "Belgium", away: "New Zealand", kickoff: "2026-06-27T19:00:00Z" },
+  { id: "G6", group: "G", home: "Egypt", away: "Iran", kickoff: "2026-06-27T19:00:00Z" },
+  { id: "H1", group: "H", home: "Spain", away: "Cape Verde", kickoff: "2026-06-16T01:00:00Z" },
+  { id: "H2", group: "H", home: "Saudi Arabia", away: "Uruguay", kickoff: "2026-06-17T19:00:00Z" },
+  { id: "H3", group: "H", home: "Spain", away: "Saudi Arabia", kickoff: "2026-06-22T22:00:00Z" },
+  { id: "H4", group: "H", home: "Uruguay", away: "Cape Verde", kickoff: "2026-06-23T19:00:00Z" },
+  { id: "H5", group: "H", home: "Spain", away: "Uruguay", kickoff: "2026-06-27T22:00:00Z" },
+  { id: "H6", group: "H", home: "Cape Verde", away: "Saudi Arabia", kickoff: "2026-06-27T22:00:00Z" },
   { id: "I1", group: "I", home: "France", away: "Senegal", kickoff: "2026-06-16T20:00:00Z" },
-  { id: "I2", group: "I", home: "Iraq", away: "Norway", kickoff: "2026-06-17T20:00:00Z" },
-  { id: "I3", group: "I", home: "France", away: "Norway", kickoff: "2026-06-21T20:00:00Z" },
-  { id: "I4", group: "I", home: "Iraq", away: "Senegal", kickoff: "2026-06-22T02:00:00Z" },
-  { id: "I5", group: "I", home: "Senegal", away: "Norway", kickoff: "2026-06-25T20:00:00Z" },
-  { id: "I6", group: "I", home: "France", away: "Iraq", kickoff: "2026-06-25T20:00:00Z" },
-  { id: "J1", group: "J", home: "Argentina", away: "Algeria", kickoff: "2026-06-16T23:00:00Z" },
-  { id: "J2", group: "J", home: "Austria", away: "Jordan", kickoff: "2026-06-17T23:00:00Z" },
-  { id: "J3", group: "J", home: "Argentina", away: "Jordan", kickoff: "2026-06-21T23:00:00Z" },
-  { id: "J4", group: "J", home: "Austria", away: "Algeria", kickoff: "2026-06-22T20:00:00Z" },
-  { id: "J5", group: "J", home: "Algeria", away: "Jordan", kickoff: "2026-06-25T23:00:00Z" },
-  { id: "J6", group: "J", home: "Argentina", away: "Austria", kickoff: "2026-06-25T23:00:00Z" },
-  { id: "K1", group: "K", home: "Portugal", away: "DR Congo", kickoff: "2026-06-18T02:00:00Z" },
-  { id: "K2", group: "K", home: "Uzbekistan", away: "Colombia", kickoff: "2026-06-18T20:00:00Z" },
-  { id: "K3", group: "K", home: "Portugal", away: "Colombia", kickoff: "2026-06-22T23:00:00Z" },
-  { id: "K4", group: "K", home: "Uzbekistan", away: "DR Congo", kickoff: "2026-06-23T02:00:00Z" },
-  { id: "K5", group: "K", home: "DR Congo", away: "Colombia", kickoff: "2026-06-26T20:00:00Z" },
-  { id: "K6", group: "K", home: "Portugal", away: "Uzbekistan", kickoff: "2026-06-26T20:00:00Z" },
-  { id: "L1", group: "L", home: "England", away: "Croatia", kickoff: "2026-06-17T02:00:00Z" },
-  { id: "L2", group: "L", home: "Ghana", away: "Panama", kickoff: "2026-06-19T02:00:00Z" },
-  { id: "L3", group: "L", home: "England", away: "Panama", kickoff: "2026-06-23T02:00:00Z" },
-  { id: "L4", group: "L", home: "Ghana", away: "Croatia", kickoff: "2026-06-24T02:00:00Z" },
-  { id: "L5", group: "L", home: "Croatia", away: "Panama", kickoff: "2026-06-26T23:00:00Z" },
-  { id: "L6", group: "L", home: "England", away: "Ghana", kickoff: "2026-06-26T23:00:00Z" },
+  { id: "I2", group: "I", home: "Iraq", away: "Norway", kickoff: "2026-06-17T01:00:00Z" },
+  { id: "I3", group: "I", home: "France", away: "Iraq", kickoff: "2026-06-22T01:00:00Z" },
+  { id: "I4", group: "I", home: "Norway", away: "Senegal", kickoff: "2026-06-22T20:00:00Z" },
+  { id: "I5", group: "I", home: "France", away: "Norway", kickoff: "2026-06-26T19:00:00Z" },
+  { id: "I6", group: "I", home: "Senegal", away: "Iraq", kickoff: "2026-06-26T19:00:00Z" },
+  { id: "J1", group: "J", home: "Argentina", away: "Algeria", kickoff: "2026-06-17T22:00:00Z" },
+  { id: "J2", group: "J", home: "Austria", away: "Jordan", kickoff: "2026-06-18T01:00:00Z" },
+  { id: "J3", group: "J", home: "Argentina", away: "Austria", kickoff: "2026-06-22T17:00:00Z" },
+  { id: "J4", group: "J", home: "Jordan", away: "Algeria", kickoff: "2026-06-23T01:00:00Z" },
+  { id: "J5", group: "J", home: "Argentina", away: "Jordan", kickoff: "2026-06-28T01:00:00Z" },
+  { id: "J6", group: "J", home: "Algeria", away: "Austria", kickoff: "2026-06-28T01:00:00Z" },
+  { id: "K1", group: "K", home: "Portugal", away: "DR Congo", kickoff: "2026-06-18T22:00:00Z" },
+  { id: "K2", group: "K", home: "Uzbekistan", away: "Colombia", kickoff: "2026-06-19T01:00:00Z" },
+  { id: "K3", group: "K", home: "Portugal", away: "Uzbekistan", kickoff: "2026-06-23T22:00:00Z" },
+  { id: "K4", group: "K", home: "Colombia", away: "DR Congo", kickoff: "2026-06-24T19:00:00Z" },
+  { id: "K5", group: "K", home: "Portugal", away: "Colombia", kickoff: "2026-06-28T22:00:00Z" },
+  { id: "K6", group: "K", home: "DR Congo", away: "Uzbekistan", kickoff: "2026-06-28T22:00:00Z" },
+  { id: "L1", group: "L", home: "England", away: "Croatia", kickoff: "2026-06-15T22:00:00Z" },
+  { id: "L2", group: "L", home: "Ghana", away: "Panama", kickoff: "2026-06-16T01:00:00Z" },
+  { id: "L3", group: "L", home: "England", away: "Ghana", kickoff: "2026-06-21T01:00:00Z" },
+  { id: "L4", group: "L", home: "Panama", away: "Croatia", kickoff: "2026-06-20T22:00:00Z" },
+  { id: "L5", group: "L", home: "England", away: "Panama", kickoff: "2026-06-25T19:00:00Z" },
+  { id: "L6", group: "L", home: "Croatia", away: "Ghana", kickoff: "2026-06-25T19:00:00Z" },
 ];
 
 const LOCK_MINUTES = 30;
@@ -106,7 +106,7 @@ function calcPoints(pred, result) {
   if (ph === rh) pts += 2;
   if (pa === ra) pts += 2;
   if (ph !== rh || pa !== ra) {
-    if ((ph - pa) === (rh - ra)) pts += 2;
+    if ((ph - pa) === (rh - ra)) pts += 1;
   }
   if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1;
   if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1;
@@ -126,17 +126,19 @@ function formatKickoff(kickoff, tz) {
   } catch { return new Date(kickoff).toUTCString(); }
 }
 
+function formatDateHeader(kickoff, tz) {
+  try {
+    return new Date(kickoff).toLocaleDateString("en-GB", {
+      timeZone: tz || "UTC", weekday: "long", day: "numeric", month: "long"
+    });
+  } catch { return kickoff; }
+}
+
 function genGroupCode() {
   return "GP-" + Math.random().toString(36).substring(2, 7).toUpperCase();
 }
 
 async function checkAdminPassword(input) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(input);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-  // Verify via server so hash stays server-side only
   const res = await fetch("/api/admin/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -171,16 +173,54 @@ const S = {
   card: { background: "#111520", border: "1px solid #1e2433", borderRadius: 10, padding: 16, marginBottom: 12 },
   input: { background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, color: "#e8eaf0", padding: "8px 12px", fontSize: 14, width: "100%", outline: "none", boxSizing: "border-box" },
   inputSm: { background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, color: "#e8eaf0", padding: "6px 8px", fontSize: 13, width: 52, textAlign: "center", outline: "none" },
+  select: { background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, color: "#e8eaf0", padding: "7px 12px", fontSize: 13, outline: "none", cursor: "pointer" },
   btn: (v = "primary") => ({ padding: v === "sm" ? "5px 12px" : "9px 20px", borderRadius: 6, border: "none", background: v === "danger" ? "#c0392b" : v === "ghost" ? "transparent" : "#f5c518", color: v === "ghost" ? "#8892a4" : v === "danger" ? "#fff" : "#0a0c10", fontWeight: 700, fontSize: v === "sm" ? 12 : 13, cursor: "pointer" }),
   label: { fontSize: 11, color: "#8892a4", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4, display: "block" },
   badge: (c) => ({ display: "inline-block", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 700, background: c === "green" ? "#0d2818" : c === "yellow" ? "#2a2200" : c === "red" ? "#2a0d0d" : "#1a1e2a", color: c === "green" ? "#2ecc71" : c === "yellow" ? "#f5c518" : c === "red" ? "#e74c3c" : "#8892a4", border: `1px solid ${c === "green" ? "#1a5c33" : c === "yellow" ? "#5a4400" : c === "red" ? "#5a1a1a" : "#2a3040"}` }),
   section: { maxWidth: 760, margin: "0 auto", padding: "24px 16px" },
-  groupTab: (active) => ({ padding: "6px 12px", border: `1px solid ${active ? "#f5c518" : "#2a3040"}`, background: active ? "#2a2200" : "transparent", color: active ? "#f5c518" : "#8892a4", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600, margin: "0 3px 6px 0" }),
+  dateHeader: { fontSize: 12, fontWeight: 700, color: "#f5c518", textTransform: "uppercase", letterSpacing: "0.08em", padding: "14px 0 10px", borderBottom: "1px solid #1e2433", marginBottom: 12 },
   matchRow: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" },
   teamName: { fontSize: 13, fontWeight: 600, flex: 1, minWidth: 80 },
   vs: { color: "#8892a4", fontSize: 11, fontWeight: 700, width: 20, textAlign: "center" },
   ptsBadge: (pts) => ({ display: "inline-block", minWidth: 28, textAlign: "center", padding: "2px 6px", borderRadius: 4, fontWeight: 700, fontSize: 12, background: pts >= 8 ? "#0d2818" : pts >= 5 ? "#2a2200" : pts > 0 ? "#1a1e2a" : "#111520", color: pts >= 8 ? "#2ecc71" : pts >= 5 ? "#f5c518" : pts > 0 ? "#8892a4" : "#3a4050", border: `1px solid ${pts >= 8 ? "#1a5c33" : pts >= 5 ? "#5a4400" : "#2a3040"}` }),
 };
+
+// ─── DATE-GROUPED MATCH RENDERER ──────────────────────────────────────────────
+function renderMatchesByDate({ matches, tz, groupFilter, renderRow }) {
+  const filtered = matches
+    .filter(m => groupFilter === "ALL" || m.group === groupFilter)
+    .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+
+  const days = [];
+  const seen = {};
+  filtered.forEach(m => {
+    const dateKey = formatDateHeader(m.kickoff, tz);
+    if (!seen[dateKey]) { seen[dateKey] = true; days.push({ dateKey, matches: [] }); }
+    days[days.length - 1].matches.push(m);
+  });
+
+  return days.map(({ dateKey, matches: dayMatches }) => (
+    <div key={dateKey}>
+      <div style={S.dateHeader}>{dateKey}</div>
+      {dayMatches.map(m => renderRow(m))}
+    </div>
+  ));
+}
+
+// ─── GROUP FILTER DROPDOWN ────────────────────────────────────────────────────
+function GroupFilter({ value, onChange }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+      <span style={{ fontSize: 12, color: "#8892a4", whiteSpace: "nowrap" }}>Filter:</span>
+      <select style={S.select} value={value} onChange={e => onChange(e.target.value)}>
+        <option value="ALL">All Groups</option>
+        {Object.keys(GROUPS).map(g => (
+          <option key={g} value={g}>Group {g}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
@@ -193,17 +233,15 @@ export default function App() {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [adminMode, setAdminMode] = useState(false);
   const [adminPwd, setAdminPwd] = useState("");
-  const [activeGroup, setActiveGroup] = useState("A");
+  const [groupFilter, setGroupFilter] = useState("ALL");
+  const [adminGroupFilter, setAdminGroupFilter] = useState("ALL");
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Join form
   const [joinCode, setJoinCode] = useState("");
   const [joinName, setJoinName] = useState("");
   const [joinPin, setJoinPin] = useState("");
   const [joinError, setJoinError] = useState("");
-
-  // Admin create group
   const [newGroupName, setNewGroupName] = useState("");
 
   useEffect(() => {
@@ -240,7 +278,6 @@ export default function App() {
     } catch { }
   }
 
-  // ── JOIN ──
   async function handleJoin() {
     setJoinError("");
     const code = joinCode.trim().toUpperCase();
@@ -256,11 +293,8 @@ export default function App() {
       });
       const data = await res.json();
       if (!res.ok) { setJoinError(data.error || "Something went wrong."); setLoading(false); return; }
-
-      // Fetch picks
       const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(name)}?pin=${pin}`);
       if (pRes.ok) setPicks(await pRes.json());
-
       setCurrentPlayer({ name, pin, groupCode: code, groupName: data.group.name });
       setScreen("predict");
       showToast(`Welcome, ${name}!`, "success");
@@ -268,7 +302,6 @@ export default function App() {
     setLoading(false);
   }
 
-  // ── SAVE PICK ──
   async function savePick(matchId, pred) {
     if (!currentPlayer) return;
     if (isLocked(MATCHES.find(m => m.id === matchId)?.kickoff)) { showToast("Match locked.", "warn"); return; }
@@ -283,7 +316,6 @@ export default function App() {
     } catch { showToast("Network error.", "warn"); }
   }
 
-  // ── ADMIN: Create group ──
   async function handleCreateGroup() {
     if (!newGroupName.trim()) return;
     const code = genGroupCode();
@@ -301,7 +333,6 @@ export default function App() {
     } catch { showToast("Network error.", "warn"); }
   }
 
-  // ── ADMIN: Save result ──
   async function saveResult(matchId, result) {
     try {
       const res = await fetch(`/api/admin/results/${matchId}`, {
@@ -353,11 +384,8 @@ export default function App() {
               <button style={S.btn()} onClick={() => setScreen("join")}>Join a Group</button>
               <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040" }} onClick={() => setScreen("leaderboard")}>View Leaderboard</button>
             </div>
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-              <button
-                style={{ ...S.btn("ghost"), border: "1px solid #2a3040", fontSize: 13 }}
-                onClick={() => setScreen("join")}
-              >
+            <div style={{ marginTop: 16 }}>
+              <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040", fontSize: 13 }} onClick={() => setScreen("join")}>
                 Already joined? Return to your picks →
               </button>
             </div>
@@ -389,8 +417,8 @@ export default function App() {
           <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Get your group code from the Gaffer.</p>
           <div style={S.card}>
             {[["Group Code", joinCode, v => setJoinCode(v.toUpperCase()), "GP-ABC12", "text"],
-            ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
-            ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
+              ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
+              ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
             ].map(([lbl, val, set, ph, type]) => (
               <div key={lbl} style={{ marginBottom: 14 }}>
                 <label style={S.label}>{lbl}</label>
@@ -409,7 +437,7 @@ export default function App() {
           <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Admin Access</h2>
           <div style={S.card}>
             <label style={S.label}>Password</label>
-            <input style={{ ...S.input, marginBottom: 12 }} type="password" value={adminPwd} onChange={e => setAdminPwd(e.target.value)} placeholder="Admin password" />
+            <input style={{ ...S.input, marginBottom: 12 }} type="password" value={adminPwd} onChange={e => setAdminPwd(e.target.value)} placeholder="Admin password" onKeyDown={e => e.key === "Enter" && e.target.blur()} />
             <button style={S.btn()} onClick={async () => {
               const ok = await checkAdminPassword(adminPwd);
               if (ok) { setAdminMode(true); setScreen("admin"); fetchAdminGroups(); }
@@ -443,14 +471,15 @@ export default function App() {
           ))}
           <div style={{ marginTop: 24 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#f5c518", marginBottom: 12 }}>ENTER RESULTS</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-              {Object.keys(GROUPS).map(g => (
-                <button key={g} style={S.groupTab(activeGroup === g)} onClick={() => setActiveGroup(g)}>Group {g}</button>
-              ))}
-            </div>
-            {MATCHES.filter(m => m.group === activeGroup).map(m => (
-              <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />
-            ))}
+            <GroupFilter value={adminGroupFilter} onChange={setAdminGroupFilter} />
+            {renderMatchesByDate({
+              matches: MATCHES,
+              tz,
+              groupFilter: adminGroupFilter,
+              renderRow: (m) => (
+                <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />
+              )
+            })}
           </div>
         </div>
       )}
@@ -462,14 +491,15 @@ export default function App() {
             <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 20, margin: 0 }}>Your Picks — {currentPlayer.groupName}</h2>
             <span style={{ fontSize: 12, color: "#8892a4" }}>Locked 30 min before kickoff</span>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
-            {Object.keys(GROUPS).map(g => (
-              <button key={g} style={S.groupTab(activeGroup === g)} onClick={() => setActiveGroup(g)}>Group {g}</button>
-            ))}
-          </div>
-          {MATCHES.filter(m => m.group === activeGroup).map(m => (
-            <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />
-          ))}
+          <GroupFilter value={groupFilter} onChange={setGroupFilter} />
+          {renderMatchesByDate({
+            matches: MATCHES,
+            tz,
+            groupFilter,
+            renderRow: (m) => (
+              <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />
+            )
+          })}
         </div>
       )}
 
@@ -477,15 +507,12 @@ export default function App() {
       {screen === "leaderboard" && (
         <div style={S.section}>
           <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Leaderboard</h2>
-          {adminMode && groups.length === 0 && <div style={{ color: "#8892a4", fontSize: 14 }}>No groups yet. Create one in admin.</div>}
           {!adminMode && Object.keys(leaderboards).length === 0 && (
             <div style={S.card}>
               <p style={{ color: "#8892a4", fontSize: 14, margin: 0 }}>Enter your group code to see your leaderboard.</p>
               <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                 <input style={{ ...S.input, flex: 1 }} placeholder="Group code (GP-XXXXX)" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} />
-                <button style={S.btn()} onClick={async () => {
-                  await fetchLeaderboard(joinCode.trim());
-                }}>Load</button>
+                <button style={S.btn()} onClick={() => fetchLeaderboard(joinCode.trim())}>Load</button>
               </div>
             </div>
           )}
@@ -496,16 +523,22 @@ export default function App() {
                 <span style={S.badge("yellow")}>{code}</span>
               </div>
               {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
-              {board.map((p, i) => (
-                <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
-                  <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: i === 0 ? "#f5c518" : i === 1 ? "#c0c0c0" : i === 2 ? "#cd7f32" : "#8892a4" }}>
-                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
-                  </span>
-                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
-                  <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
-                  <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
-                </div>
-              ))}
+              {board.map((p, i) => {
+                // Only award medals when scores differ — no medals when everyone is tied at 0
+                const prevTotal = i > 0 ? board[i - 1].total : null;
+                const rank = i === 0 ? 1 : board[i].total === prevTotal ? null : i + 1;
+                const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
+                const displayRank = medal || `${i + 1}`;
+                const rankColor = medal ? "#f5c518" : "#8892a4";
+                return (
+                  <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
+                    <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: rankColor }}>{displayRank}</span>
+                    <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
+                    <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
+                    <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
@@ -546,7 +579,9 @@ function PredictRow({ match, pick, result, tz, onSave, showToast }) {
   return (
     <div style={{ ...S.card, opacity: locked && !pick ? 0.65 : 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 4 }}>
-        <span style={{ fontSize: 11, color: "#8892a4" }}>{formatKickoff(match.kickoff, tz)}</span>
+        <span style={{ fontSize: 11, color: "#8892a4" }}>
+          {formatKickoff(match.kickoff, tz)} · <span style={{ color: "#3a4a6a" }}>Grp {match.group}</span>
+        </span>
         <div style={{ display: "flex", gap: 6 }}>
           {locked && <span style={S.badge("red")}>Locked</span>}
           {pts !== null && <span style={S.ptsBadge(pts)}>{pts} pts</span>}

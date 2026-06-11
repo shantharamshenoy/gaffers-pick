@@ -256,13 +256,13 @@ app.get("/api/leaderboard/:groupCode", async (req, res) => {
       const playerPicks = picks.filter(pk => pk.player_name.toLowerCase() === p.name.toLowerCase());
       let total = 0, predicted = 0;
       playerPicks.forEach(pk => {
+        predicted++;
         const result = resultMap[pk.match_id];
         if (result) {
           total += calcPoints(
             { homeScore: pk.home_score, awayScore: pk.away_score, yellows: pk.yellows, reds: pk.reds },
             result
           );
-          predicted++;
         }
       });
       return { name: p.name, total, predicted };
@@ -287,7 +287,7 @@ function calcPoints(pred, result) {
   if (ph === rh) pts += 2;
   if (pa === ra) pts += 2;
   if (ph !== rh || pa !== ra) {
-    if ((ph - pa) === (rh - ra)) pts += 2;
+    if ((ph - pa) === (rh - ra)) pts += 1;
   }
   if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1;
   if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1;
