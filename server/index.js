@@ -274,6 +274,33 @@ app.get("/api/leaderboard/:groupCode", async (req, res) => {
   }
 });
 
+// Featured match picks for a group
+app.get("/api/leaderboard/:groupCode/match/:matchId", async (req, res) => {
+  const { groupCode, matchId } = req.params;
+  try {
+    const { rows: players } = await pool.query(
+      "SELECT name FROM players WHERE group_code=$1", [groupCode]
+    );
+    const { rows: picks } = await pool.query(
+      "SELECT player_name, home_score, away_score, yellows, reds FROM picks WHERE group_code=$1 AND match_id=$2",
+      [groupCode, matchId]
+    );
+    const pickMap = {};
+    picks.forEach(p => { pickMap[p.player_name.toLowerCase()] = p; });
+
+    const result = players.map(p => {
+      const pk = pickMap[p.name.toLowerCase()];
+      return {
+        name: p.name,
+        pick: pk ? { homeScore: pk.home_score, awayScore: pk.away_score } : null
+      };
+    });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SCORING (server-side) ────────────────────────────────────────────────────
 function calcPoints(pred, result) {
   if (!pred || !result) return 0;

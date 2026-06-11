@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-// ─── MATCH DATA ───────────────────────────────────────────────────────────────
 const GROUPS = {
   A: { teams: ["Mexico", "South Africa", "South Korea", "Czechia"] },
   B: { teams: ["Canada", "Bosnia-Herzegovina", "Qatar", "Switzerland"] },
@@ -92,8 +91,8 @@ const MATCHES = [
 ];
 
 const LOCK_MINUTES = 30;
+const MATCH_DURATION_MS = 150 * 60 * 1000; // 150 min covers ET + pens buffer
 
-// ─── SCORING ──────────────────────────────────────────────────────────────────
 function calcPoints(pred, result) {
   if (!pred || !result) return 0;
   const ph = parseInt(pred.homeScore), pa = parseInt(pred.awayScore);
@@ -115,6 +114,36 @@ function calcPoints(pred, result) {
 
 function isLocked(kickoff) {
   return Date.now() >= new Date(kickoff).getTime() - LOCK_MINUTES * 60 * 1000;
+}
+
+function isLive(kickoff) {
+  const ko = new Date(kickoff).getTime();
+  const now = Date.now();
+  return now >= ko && now < ko + MATCH_DURATION_MS;
+}
+
+function isFinished(kickoff) {
+  return Date.now() >= new Date(kickoff).getTime() + MATCH_DURATION_MS;
+}
+
+// Find the featured match for a leaderboard: live match, or most recently finished
+function getFeaturedMatch() {
+  const now = Date.now();
+  const locked = MATCHES.filter(m => isLocked(m.kickoff));
+  if (!locked.length) return null;
+  const live = locked.find(m => isLive(m.kickoff));
+  if (live) return { match: live, status: "live" };
+  // Most recently finished
+  const finished = locked
+    .filter(m => isFinished(m.kickoff))
+    .sort((a, b) => new Date(b.kickoff) - new Date(a.kickoff));
+  if (finished.length) return { match: finished[0], status: "finished" };
+  // Locked but not yet started (within 30 min window)
+  const upcoming = locked
+    .filter(m => !isLive(m.kickoff) && !isFinished(m.kickoff))
+    .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+  if (upcoming.length) return { match: upcoming[0], status: "upcoming" };
+  return null;
 }
 
 function formatKickoff(kickoff, tz) {
@@ -163,7 +192,6 @@ const FLAGS = {
 };
 const flag = t => FLAGS[t] || "🏳️";
 
-// ─── STYLES ───────────────────────────────────────────────────────────────────
 const S = {
   app: { minHeight: "100vh", background: "#0a0c10", color: "#e8eaf0", fontFamily: "'Inter','Segoe UI',sans-serif", fontSize: 14 },
   header: { background: "linear-gradient(135deg,#0d1117 0%,#131822 100%)", borderBottom: "1px solid #1e2433", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, flexWrap: "wrap", gap: 8 },
@@ -185,12 +213,10 @@ const S = {
   ptsBadge: (pts) => ({ display: "inline-block", minWidth: 28, textAlign: "center", padding: "2px 6px", borderRadius: 4, fontWeight: 700, fontSize: 12, background: pts >= 8 ? "#0d2818" : pts >= 5 ? "#2a2200" : pts > 0 ? "#1a1e2a" : "#111520", color: pts >= 8 ? "#2ecc71" : pts >= 5 ? "#f5c518" : pts > 0 ? "#8892a4" : "#3a4050", border: `1px solid ${pts >= 8 ? "#1a5c33" : pts >= 5 ? "#5a4400" : "#2a3040"}` }),
 };
 
-// ─── DATE-GROUPED MATCH RENDERER ──────────────────────────────────────────────
 function renderMatchesByDate({ matches, tz, groupFilter, renderRow }) {
   const filtered = matches
     .filter(m => groupFilter === "ALL" || m.group === groupFilter)
     .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
-
   const days = [];
   const seen = {};
   filtered.forEach(m => {
@@ -198,7 +224,6 @@ function renderMatchesByDate({ matches, tz, groupFilter, renderRow }) {
     if (!seen[dateKey]) { seen[dateKey] = true; days.push({ dateKey, matches: [] }); }
     days[days.length - 1].matches.push(m);
   });
-
   return days.map(({ dateKey, matches: dayMatches }) => (
     <div key={dateKey}>
       <div style={S.dateHeader}>{dateKey}</div>
@@ -207,17 +232,97 @@ function renderMatchesByDate({ matches, tz, groupFilter, renderRow }) {
   ));
 }
 
-// ─── GROUP FILTER DROPDOWN ────────────────────────────────────────────────────
 function GroupFilter({ value, onChange }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
       <span style={{ fontSize: 12, color: "#8892a4", whiteSpace: "nowrap" }}>Filter:</span>
       <select style={S.select} value={value} onChange={e => onChange(e.target.value)}>
         <option value="ALL">All Groups</option>
-        {Object.keys(GROUPS).map(g => (
-          <option key={g} value={g}>Group {g}</option>
-        ))}
+        {Object.keys(GROUPS).map(g => <option key={g} value={g}>Group {g}</option>)}
       </select>
+    </div>
+  );
+}
+
+// ─── FEATURED MATCH CARD ──────────────────────────────────────────────────────
+function FeaturedMatchCard({ groupCode, result, tz }) {
+  const [featured, setFeatured] = useState(null);
+  const [playerPicks, setPlayerPicks] = useState([]);
+  const [loadingPicks, setLoadingPicks] = useState(false);
+
+  useEffect(() => {
+    const f = getFeaturedMatch();
+    setFeatured(f);
+    if (f && groupCode) {
+      setLoadingPicks(true);
+      fetch(`/api/leaderboard/${groupCode}/match/${f.match.id}`)
+        .then(r => r.ok ? r.json() : [])
+        .then(data => { setPlayerPicks(data); setLoadingPicks(false); })
+        .catch(() => setLoadingPicks(false));
+    }
+  }, [groupCode]);
+
+  if (!featured) return null;
+
+  const { match, status } = featured;
+  const matchResult = result;
+  const isLiveNow = status === "live";
+  const isFinishedNow = status === "finished";
+
+  return (
+    <div style={{ background: "linear-gradient(135deg,#0d1a2a 0%,#111520 100%)", border: `1px solid ${isLiveNow ? "#e74c3c" : "#2a3856"}`, borderRadius: 12, padding: 16, marginBottom: 20 }}>
+      {/* Match header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {isLiveNow && (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#2a0d0d", border: "1px solid #e74c3c", color: "#e74c3c", fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#e74c3c", display: "inline-block", animation: "pulse 1s infinite" }} />
+              Live
+            </span>
+          )}
+          {isFinishedNow && !matchResult && (
+            <span style={S.badge("")}>FT</span>
+          )}
+          {matchResult && (
+            <span style={S.badge("green")}>Result In</span>
+          )}
+        </div>
+        <span style={{ fontSize: 11, color: "#8892a4" }}>{formatKickoff(match.kickoff, tz)} · Grp {match.group}</span>
+      </div>
+
+      {/* Teams + result */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 14 }}>
+        <span style={{ fontSize: 15, fontWeight: 700, textAlign: "right", flex: 1 }}>{flag(match.home)} {match.home}</span>
+        <span style={{ fontSize: 20, fontWeight: 800, color: matchResult ? "#f5c518" : "#8892a4", minWidth: 60, textAlign: "center" }}>
+          {matchResult ? `${matchResult.homeScore} – ${matchResult.awayScore}` : "– –"}
+        </span>
+        <span style={{ fontSize: 15, fontWeight: 700, textAlign: "left", flex: 1 }}>{match.away} {flag(match.away)}</span>
+      </div>
+
+      {/* Player picks */}
+      <div style={{ borderTop: "1px solid #1e2433", paddingTop: 12 }}>
+        <div style={{ fontSize: 11, color: "#8892a4", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Everyone's Picks</div>
+        {loadingPicks && <div style={{ color: "#8892a4", fontSize: 12 }}>Loading…</div>}
+        {!loadingPicks && playerPicks.map(p => {
+          const pts = p.pick && matchResult ? calcPoints(
+            { homeScore: p.pick.homeScore, awayScore: p.pick.awayScore },
+            matchResult
+          ) : null;
+          return (
+            <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", borderBottom: "1px solid #0d1117" }}>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{p.name}</span>
+              {p.pick ? (
+                <span style={{ fontSize: 13, color: "#e8eaf0", fontWeight: 700, background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, padding: "3px 10px" }}>
+                  {flag(match.home)} {p.pick.homeScore} – {p.pick.awayScore} {flag(match.away)}
+                </span>
+              ) : (
+                <span style={{ fontSize: 12, color: "#3a4050", fontStyle: "italic" }}>no pick</span>
+              )}
+              {pts !== null && <span style={S.ptsBadge(pts)}>{pts}pts</span>}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -237,7 +342,6 @@ export default function App() {
   const [adminGroupFilter, setAdminGroupFilter] = useState("ALL");
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [joinCode, setJoinCode] = useState("");
   const [joinName, setJoinName] = useState("");
   const [joinPin, setJoinPin] = useState("");
@@ -347,6 +451,8 @@ export default function App() {
 
   return (
     <div style={S.app}>
+      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }`}</style>
+
       {/* HEADER */}
       <div style={S.header}>
         <div style={S.logo} onClick={() => setScreen("home")}>
@@ -400,7 +506,7 @@ export default function App() {
           </div>
           <div style={{ ...S.card, marginTop: 20 }}>
             <div style={{ fontSize: 12, color: "#f5c518", fontWeight: 700, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.08em" }}>Scoring</div>
-            {[["Correct result (W/D/L)", "3 pts"], ["Exact home score", "+2 pts"], ["Exact away score", "+2 pts"], ["Correct goal difference", "+2 pts"], ["Correct yellow cards", "+1 pt"], ["Correct red cards", "+1 pt"]].map(([l, v]) => (
+            {[["Correct result (W/D/L)", "3 pts"], ["Exact home score", "+2 pts"], ["Exact away score", "+2 pts"], ["Correct goal difference", "+1 pt"], ["Correct yellow cards", "+1 pt"], ["Correct red cards", "+1 pt"]].map(([l, v]) => (
               <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid #1a1e2a", fontSize: 13 }}>
                 <span style={{ color: "#c8ccd8" }}>{l}</span>
                 <span style={{ color: "#f5c518", fontWeight: 700 }}>{v}</span>
@@ -437,7 +543,7 @@ export default function App() {
           <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Admin Access</h2>
           <div style={S.card}>
             <label style={S.label}>Password</label>
-            <input style={{ ...S.input, marginBottom: 12 }} type="password" value={adminPwd} onChange={e => setAdminPwd(e.target.value)} placeholder="Admin password" onKeyDown={e => e.key === "Enter" && e.target.blur()} />
+            <input style={{ ...S.input, marginBottom: 12 }} type="password" value={adminPwd} onChange={e => setAdminPwd(e.target.value)} placeholder="Admin password" />
             <button style={S.btn()} onClick={async () => {
               const ok = await checkAdminPassword(adminPwd);
               if (ok) { setAdminMode(true); setScreen("admin"); fetchAdminGroups(); }
@@ -473,12 +579,8 @@ export default function App() {
             <div style={{ fontSize: 13, fontWeight: 700, color: "#f5c518", marginBottom: 12 }}>ENTER RESULTS</div>
             <GroupFilter value={adminGroupFilter} onChange={setAdminGroupFilter} />
             {renderMatchesByDate({
-              matches: MATCHES,
-              tz,
-              groupFilter: adminGroupFilter,
-              renderRow: (m) => (
-                <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />
-              )
+              matches: MATCHES, tz, groupFilter: adminGroupFilter,
+              renderRow: (m) => <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />
             })}
           </div>
         </div>
@@ -493,12 +595,8 @@ export default function App() {
           </div>
           <GroupFilter value={groupFilter} onChange={setGroupFilter} />
           {renderMatchesByDate({
-            matches: MATCHES,
-            tz,
-            groupFilter,
-            renderRow: (m) => (
-              <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />
-            )
+            matches: MATCHES, tz, groupFilter,
+            renderRow: (m) => <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />
           })}
         </div>
       )}
@@ -517,28 +615,34 @@ export default function App() {
             </div>
           )}
           {Object.entries(leaderboards).map(([code, board]) => (
-            <div key={code} style={{ ...S.card, marginBottom: 20 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                <span style={{ fontWeight: 700, fontSize: 16 }}>{groups.find(g => g.code === code)?.name || code}</span>
-                <span style={S.badge("yellow")}>{code}</span>
+            <div key={code}>
+              {/* Featured match card per group */}
+              <FeaturedMatchCard
+                groupCode={code}
+                result={(() => { const f = getFeaturedMatch(); return f ? results[f.match.id] : null; })()}
+                tz={tz}
+              />
+              <div style={{ ...S.card, marginBottom: 20 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <span style={{ fontWeight: 700, fontSize: 16 }}>{groups.find(g => g.code === code)?.name || code}</span>
+                  <span style={S.badge("yellow")}>{code}</span>
+                </div>
+                {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
+                {board.map((p, i) => {
+                  const prevTotal = i > 0 ? board[i - 1].total : null;
+                  const rank = i === 0 ? 1 : board[i].total === prevTotal ? null : i + 1;
+                  const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
+                  const displayRank = medal || `${i + 1}`;
+                  return (
+                    <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
+                      <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: medal ? "#f5c518" : "#8892a4" }}>{displayRank}</span>
+                      <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
+                      <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
+                      <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
+                    </div>
+                  );
+                })}
               </div>
-              {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
-              {board.map((p, i) => {
-                // Only award medals when scores differ — no medals when everyone is tied at 0
-                const prevTotal = i > 0 ? board[i - 1].total : null;
-                const rank = i === 0 ? 1 : board[i].total === prevTotal ? null : i + 1;
-                const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
-                const displayRank = medal || `${i + 1}`;
-                const rankColor = medal ? "#f5c518" : "#8892a4";
-                return (
-                  <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
-                    <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: rankColor }}>{displayRank}</span>
-                    <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
-                    <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
-                    <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
-                  </div>
-                );
-              })}
             </div>
           ))}
         </div>
