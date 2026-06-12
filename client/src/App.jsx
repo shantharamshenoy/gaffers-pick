@@ -340,6 +340,7 @@ export default function App() {
   const [adminPwd, setAdminPwd] = useState("");
   const [groupFilter, setGroupFilter] = useState("ALL");
   const [adminGroupFilter, setAdminGroupFilter] = useState("ALL");
+  const [adminLbGroup, setAdminLbGroup] = useState("");
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [joinCode, setJoinCode] = useState("");
@@ -501,7 +502,7 @@ export default function App() {
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           {currentPlayer && <span style={{ fontSize: 12, color: "#8892a4" }}>👤 {currentPlayer.name}</span>}
           {currentPlayer && <button style={S.pill(screen === "predict")} onClick={() => setScreen("predict")}>Picks</button>}
-          <button style={S.pill(screen === "leaderboard")} onClick={() => { setScreen("leaderboard"); Object.keys(leaderboards).forEach(fetchLeaderboard); }}>Board</button>
+          <button style={S.pill(screen === "leaderboard")} onClick={() => { setScreen("leaderboard"); Object.keys(leaderboards).forEach(fetchLeaderboard); if (adminMode) fetchAdminGroups(); }}>Board</button>
           {adminMode
             ? <button style={S.pill(screen === "admin")} onClick={() => { setScreen("admin"); fetchAdminGroups(); }}>Admin</button>
             : <button style={S.pill(false)} onClick={() => setScreen("adminLogin")}>⚙</button>}
@@ -682,6 +683,27 @@ export default function App() {
       {screen === "leaderboard" && (
         <div style={S.section}>
           <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 20 }}>Leaderboard</h2>
+
+          {adminMode && (
+            <div style={{ ...S.card, marginBottom: 20 }}>
+              <label style={S.label}>View Leaderboard For</label>
+              <select
+                style={S.select}
+                value={adminLbGroup}
+                onChange={e => {
+                  const code = e.target.value;
+                  setAdminLbGroup(code);
+                  if (code) fetchLeaderboard(code);
+                }}
+              >
+                <option value="">Select a group…</option>
+                {groups.map(g => (
+                  <option key={g.code} value={g.code}>{g.name} ({g.code})</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {!adminMode && Object.keys(leaderboards).length === 0 && (
             <div style={S.card}>
               <p style={{ color: "#8892a4", fontSize: 14, margin: 0 }}>Enter your group code to see your leaderboard.</p>
@@ -691,7 +713,14 @@ export default function App() {
               </div>
             </div>
           )}
-          {Object.entries(leaderboards).map(([code, data]) => {
+
+          {adminMode && !adminLbGroup && (
+            <div style={{ color: "#8892a4", fontSize: 13 }}>Select a group above to view its leaderboard.</div>
+          )}
+
+          {Object.entries(leaderboards)
+            .filter(([code]) => !adminMode || code === adminLbGroup)
+            .map(([code, data]) => {
             const board = data.board || [];
             const groupName = data.groupName || code;
             return (
