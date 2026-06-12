@@ -691,7 +691,10 @@ export default function App() {
               </div>
             </div>
           )}
-          {Object.entries(leaderboards).map(([code, board]) => (
+          {Object.entries(leaderboards).map(([code, data]) => {
+            const board = data.board || [];
+            const groupName = data.groupName || code;
+            return (
             <div key={code}>
               {/* Featured match card per group */}
               <FeaturedMatchCard
@@ -701,7 +704,7 @@ export default function App() {
               />
               <div style={{ ...S.card, marginBottom: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                  <span style={{ fontWeight: 700, fontSize: 16 }}>{groups.find(g => g.code === code)?.name || code}</span>
+                  <span style={{ fontWeight: 700, fontSize: 16 }}>{groupName}</span>
                   <span style={S.badge("yellow")}>{code}</span>
                 </div>
                 {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
@@ -721,7 +724,8 @@ export default function App() {
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

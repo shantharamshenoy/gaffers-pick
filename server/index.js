@@ -237,6 +237,11 @@ app.get("/api/picks/:groupCode/:playerName", async (req, res) => {
 // Leaderboard for a group
 app.get("/api/leaderboard/:groupCode", async (req, res) => {
   try {
+    const { rows: groupRows } = await pool.query(
+      "SELECT name FROM groups WHERE code=$1", [req.params.groupCode]
+    );
+    const groupName = groupRows[0]?.name || req.params.groupCode;
+
     const { rows: players } = await pool.query(
       "SELECT name FROM players WHERE group_code=$1",
       [req.params.groupCode]
@@ -268,7 +273,7 @@ app.get("/api/leaderboard/:groupCode", async (req, res) => {
       return { name: p.name, total, predicted };
     }).sort((a, b) => b.total - a.total);
 
-    res.json(board);
+    res.json({ groupName, board });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
