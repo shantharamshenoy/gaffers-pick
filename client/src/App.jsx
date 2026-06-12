@@ -347,6 +347,10 @@ export default function App() {
   const [joinPin, setJoinPin] = useState("");
   const [joinError, setJoinError] = useState("");
   const [newGroupName, setNewGroupName] = useState("");
+  const [returnName, setReturnName] = useState("");
+  const [returnPin, setReturnPin] = useState("");
+  const [returnError, setReturnError] = useState("");
+  const [returnSuggestion, setReturnSuggestion] = useState(null);
 
   useEffect(() => {
     try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { }
@@ -491,10 +495,11 @@ export default function App() {
               <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040" }} onClick={() => setScreen("leaderboard")}>View Leaderboard</button>
             </div>
             <div style={{ marginTop: 16 }}>
-              <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040", fontSize: 13 }} onClick={() => setScreen("join")}>
+              <button style={{ ...S.btn("ghost"), border: "1px solid #2a3040", fontSize: 13 }} onClick={() => setScreen("return")}>
                 Already joined? Return to your picks →
               </button>
             </div>
+
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
             {[["72", "Group Stage Matches"], ["12", "Groups"], ["48", "Nations"], ["10", "Max Pts Per Match"]].map(([n, l]) => (
@@ -523,8 +528,8 @@ export default function App() {
           <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Get your group code from the Gaffer.</p>
           <div style={S.card}>
             {[["Group Code", joinCode, v => setJoinCode(v.toUpperCase()), "GP-ABC12", "text"],
-              ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
-              ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
+            ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
+            ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
             ].map(([lbl, val, set, ph, type]) => (
               <div key={lbl} style={{ marginBottom: 14 }}>
                 <label style={S.label}>{lbl}</label>
@@ -533,6 +538,43 @@ export default function App() {
             ))}
             {joinError && <div style={{ color: "#e74c3c", fontSize: 13, marginBottom: 10 }}>{joinError}</div>}
             <button style={S.btn()} onClick={handleJoin} disabled={loading}>{loading ? "Joining…" : "Enter the Gaffer's Pick →"}</button>
+          </div>
+        </div>
+      )}
+
+      {screen === "return" && (
+        <div style={S.section}>
+          <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 4 }}>Return to Your Picks</h2>
+          <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Enter the same group code, name, and PIN you joined with.</p>
+          <div style={S.card}>
+            <div style={{ marginBottom: 14 }}>
+              <label style={S.label}>Group Code</label>
+              <input style={S.input} placeholder="GP-ABC12" value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={S.label}>Your Name</label>
+              <input style={S.input} placeholder="Exactly as you joined" value={returnName} onChange={e => setReturnName(e.target.value)} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={S.label}>PIN</label>
+              <input style={S.input} type="password" placeholder="Your PIN" maxLength={6} value={returnPin} onChange={e => setReturnPin(e.target.value.replace(/\D/, ""))} />
+            </div>
+            {returnError && <div style={{ color: "#e74c3c", fontSize: 13, marginBottom: 10 }}>{returnError}</div>}
+            {returnSuggestion && (
+              <div style={{ background: "#1a1e2a", border: "1px solid #2a3040", borderRadius: 6, padding: 10, marginBottom: 10, fontSize: 13 }}>
+                Couldn't find "{returnName}". Did you mean{" "}
+                <button
+                  style={{ background: "none", border: "none", color: "#f5c518", fontWeight: 700, cursor: "pointer", textDecoration: "underline", padding: 0, fontSize: 13 }}
+                  onClick={() => { setReturnName(returnSuggestion); handleReturn(returnSuggestion); }}
+                >
+                  {returnSuggestion}
+                </button>?
+              </div>
+            )}
+            <button style={S.btn()} onClick={() => handleReturn()} disabled={loading}>{loading ? "Checking…" : "Return to Picks →"}</button>
+            <div style={{ marginTop: 14, textAlign: "center" }}>
+              <button style={{ ...S.btn("ghost"), fontSize: 12 }} onClick={() => setScreen("join")}>New here? Join a group instead</button>
+            </div>
           </div>
         </div>
       )}
@@ -676,6 +718,41 @@ function PredictRow({ match, pick, result, tz, onSave, showToast }) {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
+  }
+
+  async function handleReturn(nameOverride) {
+    setReturnError("");
+    setReturnSuggestion(null);
+    const code = joinCode.trim().toUpperCase();
+    const name = (nameOverride || returnName).trim();
+    const pin = returnPin.trim();
+    if (!code || !name || pin.length < 4) { setReturnError("Enter group code, name, and PIN."); return; }
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/groups/${code}/player/${encodeURIComponent(name)}`);
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.suggestion) setReturnSuggestion(data.suggestion);
+        else setReturnError(data.error || "Player not found.");
+        setLoading(false);
+        return;
+      }
+      // Exact match found — now verify PIN via join endpoint (it validates without creating since name exists)
+      const joinRes = await fetch(`/api/groups/${code}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: data.exactName, pin }),
+      });
+      const joinData = await joinRes.json();
+      if (!joinRes.ok) { setReturnError(joinData.error || "Wrong PIN."); setLoading(false); return; }
+
+      const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(data.exactName)}?pin=${pin}`);
+      if (pRes.ok) setPicks(await pRes.json());
+      setCurrentPlayer({ name: data.exactName, pin, groupCode: code, groupName: joinData.group.name });
+      setScreen("predict");
+      showToast(`Welcome back, ${data.exactName}!`, "success");
+    } catch { setReturnError("Network error. Try again."); }
+    setLoading(false);
   }
 
   const pts = result && pick && pick.homeScore != null ? calcPoints(pick, result) : null;

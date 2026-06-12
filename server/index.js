@@ -301,6 +301,51 @@ app.get("/api/leaderboard/:groupCode/match/:matchId", async (req, res) => {
   }
 });
 
+// Return flow: validate existing player, suggest close matches, never create
+app.get("/api/groups/:code/player/:name", async (req, res) => {
+  const { code, name } = req.params;
+  try {
+    const { rows: players } = await pool.query(
+      "SELECT name, pin FROM players WHERE group_code=$1", [code]
+    );
+    if (!players.length) return res.status(404).json({ error: "Group not found or has no players yet." });
+
+    const exact = players.find(p => p.name.toLowerCase() === name.toLowerCase());
+    if (exact) return res.json({ found: true, exactName: exact.name });
+
+    // Fuzzy match: simple Levenshtein distance, suggest closest if reasonably close
+    function dist(a, b) {
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          dp[i][j] = a[i-1] === b[j-1]
+            ? dp[i-1][j-1]
+            : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+        }
+      }
+      return dp[m][n];
+    }
+
+    let best = null, bestDist = Infinity;
+    players.forEach(p => {
+      const d = dist(name.toLowerCase(), p.name.toLowerCase());
+      if (d < bestDist) { bestDist = d; best = p.name; }
+    });
+
+    // Only suggest if reasonably close (within 40% of the longer string's length)
+    const threshold = Math.max(2, Math.ceil(Math.max(name.length, best?.length || 0) * 0.4));
+    if (best && bestDist <= threshold) {
+      return res.status(404).json({ error: "Player not found.", suggestion: best });
+    }
+    return res.status(404).json({ error: "Player not found." });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── SCORING (server-side) ────────────────────────────────────────────────────
 function calcPoints(pred, result) {
   if (!pred || !result) return 0;
