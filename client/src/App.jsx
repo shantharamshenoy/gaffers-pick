@@ -352,6 +352,7 @@ export default function App() {
   const [returnError, setReturnError] = useState("");
   const [returnSuggestion, setReturnSuggestion] = useState(null);
 
+
   useEffect(() => {
     try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { }
     fetchResults();
@@ -407,6 +408,40 @@ export default function App() {
       setScreen("predict");
       showToast(`Welcome, ${name}!`, "success");
     } catch { setJoinError("Network error. Try again."); }
+    setLoading(false);
+  }
+
+  async function handleReturn(nameOverride) {
+    setReturnError("");
+    setReturnSuggestion(null);
+    const code = joinCode.trim().toUpperCase();
+    const name = (nameOverride || returnName).trim();
+    const pin = returnPin.trim();
+    if (!code || !name || pin.length < 4) { setReturnError("Enter group code, name, and PIN."); return; }
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/groups/${code}/player/${encodeURIComponent(name)}`);
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.suggestion) setReturnSuggestion(data.suggestion);
+        else setReturnError(data.error || "Player not found.");
+        setLoading(false);
+        return;
+      }
+      const joinRes = await fetch(`/api/groups/${code}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: data.exactName, pin }),
+      });
+      const joinData = await joinRes.json();
+      if (!joinRes.ok) { setReturnError(joinData.error || "Wrong PIN."); setLoading(false); return; }
+
+      const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(data.exactName)}?pin=${pin}`);
+      if (pRes.ok) setPicks(await pRes.json());
+      setCurrentPlayer({ name: data.exactName, pin, groupCode: code, groupName: joinData.group.name });
+      setScreen("predict");
+      showToast(`Welcome back, ${data.exactName}!`, "success");
+    } catch { setReturnError("Network error. Try again."); }
     setLoading(false);
   }
 
@@ -499,7 +534,6 @@ export default function App() {
                 Already joined? Return to your picks →
               </button>
             </div>
-
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
             {[["72", "Group Stage Matches"], ["12", "Groups"], ["48", "Nations"], ["10", "Max Pts Per Match"]].map(([n, l]) => (
@@ -528,8 +562,8 @@ export default function App() {
           <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Get your group code from the Gaffer.</p>
           <div style={S.card}>
             {[["Group Code", joinCode, v => setJoinCode(v.toUpperCase()), "GP-ABC12", "text"],
-            ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
-            ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
+              ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
+              ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
             ].map(([lbl, val, set, ph, type]) => (
               <div key={lbl} style={{ marginBottom: 14 }}>
                 <label style={S.label}>{lbl}</label>
@@ -542,6 +576,7 @@ export default function App() {
         </div>
       )}
 
+      {/* RETURN */}
       {screen === "return" && (
         <div style={S.section}>
           <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 22, marginBottom: 4 }}>Return to Your Picks</h2>
@@ -718,41 +753,6 @@ function PredictRow({ match, pick, result, tz, onSave, showToast }) {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
-  }
-
-  async function handleReturn(nameOverride) {
-    setReturnError("");
-    setReturnSuggestion(null);
-    const code = joinCode.trim().toUpperCase();
-    const name = (nameOverride || returnName).trim();
-    const pin = returnPin.trim();
-    if (!code || !name || pin.length < 4) { setReturnError("Enter group code, name, and PIN."); return; }
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/groups/${code}/player/${encodeURIComponent(name)}`);
-      const data = await res.json();
-      if (!res.ok) {
-        if (data.suggestion) setReturnSuggestion(data.suggestion);
-        else setReturnError(data.error || "Player not found.");
-        setLoading(false);
-        return;
-      }
-      // Exact match found — now verify PIN via join endpoint (it validates without creating since name exists)
-      const joinRes = await fetch(`/api/groups/${code}/join`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: data.exactName, pin }),
-      });
-      const joinData = await joinRes.json();
-      if (!joinRes.ok) { setReturnError(joinData.error || "Wrong PIN."); setLoading(false); return; }
-
-      const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(data.exactName)}?pin=${pin}`);
-      if (pRes.ok) setPicks(await pRes.json());
-      setCurrentPlayer({ name: data.exactName, pin, groupCode: code, groupName: joinData.group.name });
-      setScreen("predict");
-      showToast(`Welcome back, ${data.exactName}!`, "success");
-    } catch { setReturnError("Network error. Try again."); }
-    setLoading(false);
   }
 
   const pts = result && pick && pick.homeScore != null ? calcPoints(pick, result) : null;
