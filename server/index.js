@@ -84,6 +84,9 @@ function adminAuth(req, res, next) {
 // Health
 app.get("/api/health", (_, res) => res.json({ ok: true }));
 
+// Server Time
+app.get("/api/time", (_, res) => res.json({ now: Date.now() }));
+
 // Admin: verify password
 app.post("/api/admin/verify", (req, res) => {
 	const { password } = req.body;
@@ -237,7 +240,7 @@ app.post("/api/picks", async (req, res) => {
 		);
 		if (!rows.length || rows[0].pin !== pin)
 			return res.status(401).json({ error: "Invalid PIN" });
-    
+
 		const match = MATCHES.find((m) => m.id === matchId);
 		if (match) {
 			const lockTime = new Date(match.kickoff).getTime() - 30 * 60 * 1000;

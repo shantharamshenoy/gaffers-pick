@@ -18,76 +18,76 @@ const GROUPS = {
 const MATCHES = [
   { id: "A1", group: "A", home: "Mexico", away: "South Africa", kickoff: "2026-06-11T19:00:00Z" },
   { id: "A2", group: "A", home: "South Korea", away: "Czechia", kickoff: "2026-06-12T02:00:00Z" },
-  { id: "A3", group: "A", home: "Czechia", away: "South Africa", kickoff: "2026-06-18T16:00:00Z" },
-  { id: "A4", group: "A", home: "Mexico", away: "South Korea", kickoff: "2026-06-19T01:00:00Z" },
-  { id: "A5", group: "A", home: "South Africa", away: "South Korea", kickoff: "2026-06-25T01:00:00Z" },
-  { id: "A6", group: "A", home: "Czechia", away: "Mexico", kickoff: "2026-06-25T01:00:00Z" },
-  { id: "B1", group: "B", home: "Canada", away: "Bosnia and Herzegovina", kickoff: "2026-06-12T19:00:00Z" },
+  { id: "A3", group: "A", home: "Mexico", away: "South Korea", kickoff: "2026-06-19T01:00:00Z" },
+  { id: "A4", group: "A", home: "South Africa", away: "Czechia", kickoff: "2026-06-19T01:00:00Z" },
+  { id: "A5", group: "A", home: "Mexico", away: "Czechia", kickoff: "2026-06-25T01:00:00Z" },
+  { id: "A6", group: "A", home: "South Korea", away: "South Africa", kickoff: "2026-06-25T01:00:00Z" },
+  { id: "B1", group: "B", home: "Canada", away: "Bosnia-Herzegovina", kickoff: "2026-06-12T19:00:00Z" },
   { id: "B2", group: "B", home: "Qatar", away: "Switzerland", kickoff: "2026-06-13T19:00:00Z" },
-  { id: "B3", group: "B", home: "Switzerland", away: "Bosnia and Herzegovina", kickoff: "2026-06-18T19:00:00Z" },
-  { id: "B4", group: "B", home: "Canada", away: "Qatar", kickoff: "2026-06-18T22:00:00Z" },
-  { id: "B5", group: "B", home: "Switzerland", away: "Canada", kickoff: "2026-06-24T19:00:00Z" },
-  { id: "B6", group: "B", home: "Bosnia and Herzegovina", away: "Qatar", kickoff: "2026-06-24T19:00:00Z" },
+  { id: "B3", group: "B", home: "Canada", away: "Qatar", kickoff: "2026-06-17T22:00:00Z" },
+  { id: "B4", group: "B", home: "Bosnia-Herzegovina", away: "Switzerland", kickoff: "2026-06-18T19:00:00Z" },
+  { id: "B5", group: "B", home: "Canada", away: "Switzerland", kickoff: "2026-06-24T01:00:00Z" },
+  { id: "B6", group: "B", home: "Bosnia-Herzegovina", away: "Qatar", kickoff: "2026-06-24T01:00:00Z" },
   { id: "C1", group: "C", home: "Brazil", away: "Morocco", kickoff: "2026-06-13T22:00:00Z" },
-  { id: "C2", group: "C", home: "Haiti", away: "Scotland", kickoff: "2026-06-14T01:00:00Z" },
-  { id: "C3", group: "C", home: "Scotland", away: "Morocco", kickoff: "2026-06-19T22:00:00Z" },
-  { id: "C4", group: "C", home: "Brazil", away: "Haiti", kickoff: "2026-06-20T01:00:00Z" },
-  { id: "C5", group: "C", home: "Morocco", away: "Haiti", kickoff: "2026-06-24T22:00:00Z" },
-  { id: "C6", group: "C", home: "Scotland", away: "Brazil", kickoff: "2026-06-24T22:00:00Z" },
+  { id: "C2", group: "C", home: "Haiti", away: "Scotland", kickoff: "2026-06-14T19:00:00Z" },
+  { id: "C3", group: "C", home: "Brazil", away: "Scotland", kickoff: "2026-06-18T22:00:00Z" },
+  { id: "C4", group: "C", home: "Morocco", away: "Haiti", kickoff: "2026-06-19T19:00:00Z" },
+  { id: "C5", group: "C", home: "Brazil", away: "Haiti", kickoff: "2026-06-24T22:00:00Z" },
+  { id: "C6", group: "C", home: "Scotland", away: "Morocco", kickoff: "2026-06-24T22:00:00Z" },
   { id: "D1", group: "D", home: "USA", away: "Paraguay", kickoff: "2026-06-13T01:00:00Z" },
-  { id: "D2", group: "D", home: "Australia", away: "Turkey", kickoff: "2026-06-14T04:00:00Z" },
-  { id: "D3", group: "D", home: "USA", away: "Australia", kickoff: "2026-06-19T19:00:00Z" },
-  { id: "D4", group: "D", home: "Turkey", away: "Paraguay", kickoff: "2026-06-20T04:00:00Z" },
-  { id: "D5", group: "D", home: "Turkey", away: "USA", kickoff: "2026-06-26T02:00:00Z" },
-  { id: "D6", group: "D", home: "Paraguay", away: "Australia", kickoff: "2026-06-26T02:00:00Z" },
-  { id: "E1", group: "E", home: "Germany", away: "Curacao", kickoff: "2026-06-14T17:00:00Z" },
-  { id: "E2", group: "E", home: "Ivory Coast", away: "Ecuador", kickoff: "2026-06-14T23:00:00Z" },
-  { id: "E3", group: "E", home: "Germany", away: "Ivory Coast", kickoff: "2026-06-20T20:00:00Z" },
-  { id: "E4", group: "E", home: "Ecuador", away: "Curacao", kickoff: "2026-06-21T00:00:00Z" },
-  { id: "E5", group: "E", home: "Curacao", away: "Ivory Coast", kickoff: "2026-06-25T20:00:00Z" },
-  { id: "E6", group: "E", home: "Ecuador", away: "Germany", kickoff: "2026-06-25T20:00:00Z" },
-  { id: "F1", group: "F", home: "Netherlands", away: "Japan", kickoff: "2026-06-14T20:00:00Z" },
-  { id: "F2", group: "F", home: "Sweden", away: "Tunisia", kickoff: "2026-06-15T02:00:00Z" },
-  { id: "F3", group: "F", home: "Netherlands", away: "Sweden", kickoff: "2026-06-20T17:00:00Z" },
-  { id: "F4", group: "F", home: "Tunisia", away: "Japan", kickoff: "2026-06-21T04:00:00Z" },
-  { id: "F5", group: "F", home: "Tunisia", away: "Netherlands", kickoff: "2026-06-25T23:00:00Z" },
-  { id: "F6", group: "F", home: "Japan", away: "Sweden", kickoff: "2026-06-25T23:00:00Z" },
-  { id: "G1", group: "G", home: "Belgium", away: "Egypt", kickoff: "2026-06-15T19:00:00Z" },
-  { id: "G2", group: "G", home: "Iran", away: "New Zealand", kickoff: "2026-06-16T01:00:00Z" },
-  { id: "G3", group: "G", home: "Belgium", away: "Iran", kickoff: "2026-06-21T19:00:00Z" },
-  { id: "G4", group: "G", home: "New Zealand", away: "Egypt", kickoff: "2026-06-22T01:00:00Z" },
-  { id: "G5", group: "G", home: "New Zealand", away: "Belgium", kickoff: "2026-06-27T03:00:00Z" },
-  { id: "G6", group: "G", home: "Egypt", away: "Iran", kickoff: "2026-06-27T03:00:00Z" },
-  { id: "H1", group: "H", home: "Spain", away: "Cape Verde", kickoff: "2026-06-15T16:00:00Z" },
-  { id: "H2", group: "H", home: "Saudi Arabia", away: "Uruguay", kickoff: "2026-06-15T22:00:00Z" },
-  { id: "H3", group: "H", home: "Spain", away: "Saudi Arabia", kickoff: "2026-06-21T16:00:00Z" },
-  { id: "H4", group: "H", home: "Uruguay", away: "Cape Verde", kickoff: "2026-06-21T22:00:00Z" },
-  { id: "H5", group: "H", home: "Cape Verde", away: "Saudi Arabia", kickoff: "2026-06-27T00:00:00Z" },
-  { id: "H6", group: "H", home: "Uruguay", away: "Spain", kickoff: "2026-06-27T00:00:00Z" },
-  { id: "I1", group: "I", home: "France", away: "Senegal", kickoff: "2026-06-16T19:00:00Z" },
-  { id: "I2", group: "I", home: "Iraq", away: "Norway", kickoff: "2026-06-16T22:00:00Z" },
-  { id: "I3", group: "I", home: "France", away: "Iraq", kickoff: "2026-06-22T21:00:00Z" },
-  { id: "I4", group: "I", home: "Norway", away: "Senegal", kickoff: "2026-06-23T00:00:00Z" },
-  { id: "I5", group: "I", home: "Norway", away: "France", kickoff: "2026-06-26T19:00:00Z" },
+  { id: "D2", group: "D", home: "Australia", away: "Türkiye", kickoff: "2026-06-14T22:00:00Z" },
+  { id: "D3", group: "D", home: "USA", away: "Australia", kickoff: "2026-06-19T22:00:00Z" },
+  { id: "D4", group: "D", home: "Türkiye", away: "Paraguay", kickoff: "2026-06-20T19:00:00Z" },
+  { id: "D5", group: "D", home: "USA", away: "Türkiye", kickoff: "2026-06-26T01:00:00Z" },
+  { id: "D6", group: "D", home: "Paraguay", away: "Australia", kickoff: "2026-06-26T01:00:00Z" },
+  { id: "E1", group: "E", home: "Germany", away: "Curaçao", kickoff: "2026-06-14T01:00:00Z" },
+  { id: "E2", group: "E", home: "Ivory Coast", away: "Ecuador", kickoff: "2026-06-15T19:00:00Z" },
+  { id: "E3", group: "E", home: "Germany", away: "Ivory Coast", kickoff: "2026-06-20T22:00:00Z" },
+  { id: "E4", group: "E", home: "Ecuador", away: "Curaçao", kickoff: "2026-06-21T19:00:00Z" },
+  { id: "E5", group: "E", home: "Germany", away: "Ecuador", kickoff: "2026-06-25T22:00:00Z" },
+  { id: "E6", group: "E", home: "Curaçao", away: "Ivory Coast", kickoff: "2026-06-25T22:00:00Z" },
+  { id: "F1", group: "F", home: "Netherlands", away: "Japan", kickoff: "2026-06-15T01:00:00Z" },
+  { id: "F2", group: "F", home: "Sweden", away: "Tunisia", kickoff: "2026-06-15T22:00:00Z" },
+  { id: "F3", group: "F", home: "Netherlands", away: "Sweden", kickoff: "2026-06-21T01:00:00Z" },
+  { id: "F4", group: "F", home: "Japan", away: "Tunisia", kickoff: "2026-06-20T01:00:00Z" },
+  { id: "F5", group: "F", home: "Netherlands", away: "Tunisia", kickoff: "2026-06-26T22:00:00Z" },
+  { id: "F6", group: "F", home: "Sweden", away: "Japan", kickoff: "2026-06-26T22:00:00Z" },
+  { id: "G1", group: "G", home: "Belgium", away: "Egypt", kickoff: "2026-06-16T19:00:00Z" },
+  { id: "G2", group: "G", home: "Iran", away: "New Zealand", kickoff: "2026-06-16T22:00:00Z" },
+  { id: "G3", group: "G", home: "Belgium", away: "Iran", kickoff: "2026-06-21T22:00:00Z" },
+  { id: "G4", group: "G", home: "New Zealand", away: "Egypt", kickoff: "2026-06-22T19:00:00Z" },
+  { id: "G5", group: "G", home: "Belgium", away: "New Zealand", kickoff: "2026-06-27T19:00:00Z" },
+  { id: "G6", group: "G", home: "Egypt", away: "Iran", kickoff: "2026-06-27T19:00:00Z" },
+  { id: "H1", group: "H", home: "Spain", away: "Cape Verde", kickoff: "2026-06-16T01:00:00Z" },
+  { id: "H2", group: "H", home: "Saudi Arabia", away: "Uruguay", kickoff: "2026-06-17T19:00:00Z" },
+  { id: "H3", group: "H", home: "Spain", away: "Saudi Arabia", kickoff: "2026-06-22T22:00:00Z" },
+  { id: "H4", group: "H", home: "Uruguay", away: "Cape Verde", kickoff: "2026-06-23T19:00:00Z" },
+  { id: "H5", group: "H", home: "Spain", away: "Uruguay", kickoff: "2026-06-27T22:00:00Z" },
+  { id: "H6", group: "H", home: "Cape Verde", away: "Saudi Arabia", kickoff: "2026-06-27T22:00:00Z" },
+  { id: "I1", group: "I", home: "France", away: "Senegal", kickoff: "2026-06-16T20:00:00Z" },
+  { id: "I2", group: "I", home: "Iraq", away: "Norway", kickoff: "2026-06-17T01:00:00Z" },
+  { id: "I3", group: "I", home: "France", away: "Iraq", kickoff: "2026-06-22T01:00:00Z" },
+  { id: "I4", group: "I", home: "Norway", away: "Senegal", kickoff: "2026-06-22T20:00:00Z" },
+  { id: "I5", group: "I", home: "France", away: "Norway", kickoff: "2026-06-26T19:00:00Z" },
   { id: "I6", group: "I", home: "Senegal", away: "Iraq", kickoff: "2026-06-26T19:00:00Z" },
-  { id: "J1", group: "J", home: "Argentina", away: "Algeria", kickoff: "2026-06-17T01:00:00Z" },
-  { id: "J2", group: "J", home: "Austria", away: "Jordan", kickoff: "2026-06-17T04:00:00Z" },
+  { id: "J1", group: "J", home: "Argentina", away: "Algeria", kickoff: "2026-06-17T22:00:00Z" },
+  { id: "J2", group: "J", home: "Austria", away: "Jordan", kickoff: "2026-06-18T01:00:00Z" },
   { id: "J3", group: "J", home: "Argentina", away: "Austria", kickoff: "2026-06-22T17:00:00Z" },
-  { id: "J4", group: "J", home: "Jordan", away: "Algeria", kickoff: "2026-06-23T03:00:00Z" },
-  { id: "J5", group: "J", home: "Algeria", away: "Austria", kickoff: "2026-06-28T02:00:00Z" },
-  { id: "J6", group: "J", home: "Jordan", away: "Argentina", kickoff: "2026-06-28T02:00:00Z" },
-  { id: "K1", group: "K", home: "Portugal", away: "DR Congo", kickoff: "2026-06-17T17:00:00Z" },
-  { id: "K2", group: "K", home: "Uzbekistan", away: "Colombia", kickoff: "2026-06-18T02:00:00Z" },
-  { id: "K3", group: "K", home: "Portugal", away: "Uzbekistan", kickoff: "2026-06-23T17:00:00Z" },
-  { id: "K4", group: "K", home: "Colombia", away: "DR Congo", kickoff: "2026-06-24T02:00:00Z" },
-  { id: "K5", group: "K", home: "Colombia", away: "Portugal", kickoff: "2026-06-27T23:30:00Z" },
-  { id: "K6", group: "K", home: "DR Congo", away: "Uzbekistan", kickoff: "2026-06-27T23:30:00Z" },
-  { id: "L1", group: "L", home: "England", away: "Croatia", kickoff: "2026-06-17T20:00:00Z" },
-  { id: "L2", group: "L", home: "Ghana", away: "Panama", kickoff: "2026-06-17T23:00:00Z" },
-  { id: "L3", group: "L", home: "England", away: "Ghana", kickoff: "2026-06-23T20:00:00Z" },
-  { id: "L4", group: "L", home: "Panama", away: "Croatia", kickoff: "2026-06-23T23:00:00Z" },
-  { id: "L5", group: "L", home: "Panama", away: "England", kickoff: "2026-06-27T21:00:00Z" },
-  { id: "L6", group: "L", home: "Croatia", away: "Ghana", kickoff: "2026-06-27T21:00:00Z" },
+  { id: "J4", group: "J", home: "Jordan", away: "Algeria", kickoff: "2026-06-23T01:00:00Z" },
+  { id: "J5", group: "J", home: "Argentina", away: "Jordan", kickoff: "2026-06-28T01:00:00Z" },
+  { id: "J6", group: "J", home: "Algeria", away: "Austria", kickoff: "2026-06-28T01:00:00Z" },
+  { id: "K1", group: "K", home: "Portugal", away: "DR Congo", kickoff: "2026-06-18T22:00:00Z" },
+  { id: "K2", group: "K", home: "Uzbekistan", away: "Colombia", kickoff: "2026-06-19T01:00:00Z" },
+  { id: "K3", group: "K", home: "Portugal", away: "Uzbekistan", kickoff: "2026-06-23T22:00:00Z" },
+  { id: "K4", group: "K", home: "Colombia", away: "DR Congo", kickoff: "2026-06-24T19:00:00Z" },
+  { id: "K5", group: "K", home: "Portugal", away: "Colombia", kickoff: "2026-06-28T22:00:00Z" },
+  { id: "K6", group: "K", home: "DR Congo", away: "Uzbekistan", kickoff: "2026-06-28T22:00:00Z" },
+  { id: "L1", group: "L", home: "England", away: "Croatia", kickoff: "2026-06-15T22:00:00Z" },
+  { id: "L2", group: "L", home: "Ghana", away: "Panama", kickoff: "2026-06-16T01:00:00Z" },
+  { id: "L3", group: "L", home: "England", away: "Ghana", kickoff: "2026-06-21T01:00:00Z" },
+  { id: "L4", group: "L", home: "Panama", away: "Croatia", kickoff: "2026-06-20T22:00:00Z" },
+  { id: "L5", group: "L", home: "England", away: "Panama", kickoff: "2026-06-25T19:00:00Z" },
+  { id: "L6", group: "L", home: "Croatia", away: "Ghana", kickoff: "2026-06-25T19:00:00Z" },
 ];
 
 const LOCK_MINUTES = 30;
@@ -112,35 +112,31 @@ function calcPoints(pred, result) {
   return pts;
 }
 
-function isLocked(kickoff) {
-  return Date.now() >= new Date(kickoff).getTime() - LOCK_MINUTES * 60 * 1000;
+function isLocked(kickoff, now = Date.now()) {
+  return now >= new Date(kickoff).getTime() - LOCK_MINUTES * 60 * 1000;
 }
 
-function isLive(kickoff) {
+function isLive(kickoff, now = Date.now()) {
   const ko = new Date(kickoff).getTime();
-  const now = Date.now();
   return now >= ko && now < ko + MATCH_DURATION_MS;
 }
 
-function isFinished(kickoff) {
-  return Date.now() >= new Date(kickoff).getTime() + MATCH_DURATION_MS;
+function isFinished(kickoff, now = Date.now()) {
+  return now >= new Date(kickoff).getTime() + MATCH_DURATION_MS;
 }
 
 // Find the featured match for a leaderboard: live match, or most recently finished
-function getFeaturedMatch() {
-  const now = Date.now();
-  const locked = MATCHES.filter(m => isLocked(m.kickoff));
+function getFeaturedMatch(now = Date.now()) {
+  const locked = MATCHES.filter(m => isLocked(m.kickoff, now));
   if (!locked.length) return null;
-  const live = locked.find(m => isLive(m.kickoff));
+  const live = locked.find(m => isLive(m.kickoff, now));
   if (live) return { match: live, status: "live" };
-  // Most recently finished
   const finished = locked
-    .filter(m => isFinished(m.kickoff))
+    .filter(m => isFinished(m.kickoff, now))
     .sort((a, b) => new Date(b.kickoff) - new Date(a.kickoff));
   if (finished.length) return { match: finished[0], status: "finished" };
-  // Locked but not yet started (within 30 min window)
   const upcoming = locked
-    .filter(m => !isLive(m.kickoff) && !isFinished(m.kickoff))
+    .filter(m => !isLive(m.kickoff, now) && !isFinished(m.kickoff, now))
     .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
   if (upcoming.length) return { match: upcoming[0], status: "upcoming" };
   return null;
@@ -232,6 +228,49 @@ function renderMatchesByDate({ matches, tz, groupFilter, renderRow }) {
   ));
 }
 
+// Splits matches into completed (result entered) vs upcoming, renders completed
+// inside a collapsed-by-default section above the upcoming list.
+function renderMatchesWithCompletedSection({ matches, results, tz, groupFilter, renderRow, collapsed, onToggle }) {
+  const filtered = matches.filter(m => groupFilter === "ALL" || m.group === groupFilter);
+  const completed = filtered.filter(m => results[m.id]);
+  const upcoming = filtered.filter(m => !results[m.id]);
+
+  return (
+    <div>
+      {completed.length > 0 && (
+        <CollapsibleSection
+          title={`Completed Matches (${completed.length})`}
+          collapsed={collapsed}
+          onToggle={onToggle}
+        >
+          {renderMatchesByDate({ matches: completed, tz, groupFilter: "ALL", renderRow })}
+        </CollapsibleSection>
+      )}
+      {renderMatchesByDate({ matches: upcoming, tz, groupFilter: "ALL", renderRow })}
+    </div>
+  );
+}
+
+function CollapsibleSection({ title, collapsed, onToggle, children }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <button
+        onClick={onToggle}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: "#111520", border: "1px solid #1e2433", borderRadius: 10, padding: "12px 16px",
+          cursor: "pointer", color: "#8892a4", fontSize: 13, fontWeight: 700,
+          textTransform: "uppercase", letterSpacing: "0.06em"
+        }}
+      >
+        <span>{title}</span>
+        <span style={{ fontSize: 16, transform: collapsed ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.15s" }}>▾</span>
+      </button>
+      {!collapsed && <div style={{ marginTop: 12 }}>{children}</div>}
+    </div>
+  );
+}
+
 function GroupFilter({ value, onChange }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
@@ -245,13 +284,13 @@ function GroupFilter({ value, onChange }) {
 }
 
 // ─── FEATURED MATCH CARD ──────────────────────────────────────────────────────
-function FeaturedMatchCard({ groupCode, result, tz }) {
+function FeaturedMatchCard({ groupCode, result, tz, serverNow = Date.now() }) {
   const [featured, setFeatured] = useState(null);
   const [playerPicks, setPlayerPicks] = useState([]);
   const [loadingPicks, setLoadingPicks] = useState(false);
 
   useEffect(() => {
-    const f = getFeaturedMatch();
+    const f = getFeaturedMatch(serverNow);
     setFeatured(f);
     if (f && groupCode) {
       setLoadingPicks(true);
@@ -343,6 +382,9 @@ export default function App() {
   const [adminLbGroup, setAdminLbGroup] = useState("");
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [serverNow, setServerNow] = useState(Date.now());
+  const [picksCompletedCollapsed, setPicksCompletedCollapsed] = useState(true);
+  const [adminCompletedCollapsed, setAdminCompletedCollapsed] = useState(true);
   const [joinCode, setJoinCode] = useState("");
   const [joinName, setJoinName] = useState("");
   const [joinPin, setJoinPin] = useState("");
@@ -357,6 +399,15 @@ export default function App() {
   useEffect(() => {
     try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { }
     fetchResults();
+    const syncTime = async () => {
+      try {
+        const res = await fetch("/api/time");
+        if (res.ok) { const { now } = await res.json(); setServerNow(now); }
+      } catch { }
+    };
+    syncTime();
+    const interval = setInterval(syncTime, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   function showToast(msg, type = "info") {
@@ -656,9 +707,11 @@ export default function App() {
           <div style={{ marginTop: 24 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#f5c518", marginBottom: 12 }}>ENTER RESULTS</div>
             <GroupFilter value={adminGroupFilter} onChange={setAdminGroupFilter} />
-            {renderMatchesByDate({
-              matches: MATCHES, tz, groupFilter: adminGroupFilter,
-              renderRow: (m) => <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />
+            {renderMatchesWithCompletedSection({
+              matches: MATCHES, results, tz, groupFilter: adminGroupFilter,
+              renderRow: (m) => <AdminMatchRow key={m.id} match={m} result={results[m.id]} tz={tz} onSave={(r) => saveResult(m.id, r)} />,
+              collapsed: adminCompletedCollapsed,
+              onToggle: () => setAdminCompletedCollapsed(c => !c)
             })}
           </div>
         </div>
@@ -672,9 +725,11 @@ export default function App() {
             <span style={{ fontSize: 12, color: "#8892a4" }}>Locked 30 min before kickoff</span>
           </div>
           <GroupFilter value={groupFilter} onChange={setGroupFilter} />
-          {renderMatchesByDate({
-            matches: MATCHES, tz, groupFilter,
-            renderRow: (m) => <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />
+          {renderMatchesWithCompletedSection({
+            matches: MATCHES, results, tz, groupFilter,
+            renderRow: (m) => <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} serverNow={serverNow} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />,
+            collapsed: picksCompletedCollapsed,
+            onToggle: () => setPicksCompletedCollapsed(c => !c)
           })}
         </div>
       )}
@@ -728,8 +783,9 @@ export default function App() {
               {/* Featured match card per group */}
               <FeaturedMatchCard
                 groupCode={code}
-                result={(() => { const f = getFeaturedMatch(); return f ? results[f.match.id] : null; })()}
+                result={(() => { const f = getFeaturedMatch(serverNow); return f ? results[f.match.id] : null; })()}
                 tz={tz}
+                serverNow={serverNow}
               />
               <div style={{ ...S.card, marginBottom: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -762,8 +818,8 @@ export default function App() {
 }
 
 // ─── PREDICT ROW ──────────────────────────────────────────────────────────────
-function PredictRow({ match, pick, result, tz, onSave, showToast }) {
-  const locked = isLocked(match.kickoff);
+function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast }) {
+  const locked = isLocked(match.kickoff, serverNow);
   const [h, setH] = useState(pick?.homeScore ?? "");
   const [a, setA] = useState(pick?.awayScore ?? "");
   const [y, setY] = useState(pick?.yellows ?? "");
