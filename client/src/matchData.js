@@ -1,4 +1,4 @@
-const GROUPS = {
+export const GROUPS = {
   A: { teams: ["Mexico", "South Africa", "South Korea", "Czechia"] },
   B: { teams: ["Canada", "Bosnia-Herzegovina", "Qatar", "Switzerland"] },
   C: { teams: ["Brazil", "Morocco", "Haiti", "Scotland"] },
@@ -13,7 +13,7 @@ const GROUPS = {
   L: { teams: ["England", "Croatia", "Ghana", "Panama"] },
 };
 
-const MATCHES = [
+export const MATCHES = [
   { id: "A1", group: "A", home: "Mexico", away: "South Africa", kickoff: "2026-06-11T19:00:00Z" },
   { id: "A2", group: "A", home: "South Korea", away: "Czechia", kickoff: "2026-06-12T02:00:00Z" },
   { id: "A3", group: "A", home: "Czechia", away: "South Africa", kickoff: "2026-06-18T16:00:00Z" },
