@@ -12,14 +12,12 @@ function calcPoints(pred, result) {
   let pts = 0;
   const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
   const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
-  if (predResult === realResult) pts += 3;
-  if (ph === rh) pts += 2;
-  if (pa === ra) pts += 2;
-  if (ph !== rh || pa !== ra) {
-    if ((ph - pa) === (rh - ra)) pts += 1;
-  }
-  if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1;
-  if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1;
+  if (predResult === realResult) pts += 3; // exact score
+  if (ph === rh) pts += 2; // correct home score
+  if (pa === ra) pts += 2; // correct away score
+  if ((ph - pa) === (rh - ra)) pts += 1; // correct goal difference
+  if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1; // correct yellow card count
+  if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1; // correct red card count
   return pts;
 }
 
@@ -243,9 +241,18 @@ function FeaturedMatchCard({ groupCode, result, tz, serverNow = Date.now() }) {
       {/* Teams + result */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 14 }}>
         <span style={{ fontSize: 15, fontWeight: 700, textAlign: "right", flex: 1 }}>{flag(match.home)} {match.home}</span>
-        <span style={{ fontSize: 20, fontWeight: 800, color: matchResult ? "#f5c518" : "#8892a4", minWidth: 60, textAlign: "center" }}>
-          {matchResult ? `${matchResult.homeScore} – ${matchResult.awayScore}` : "– –"}
-        </span>
+        <div style={{ textAlign: "center" }}>
+          <span style={{ fontSize: 20, fontWeight: 800, color: matchResult ? "#f5c518" : "#8892a4", display: "block" }}>
+            {matchResult ? `${matchResult.homeScore} - ${matchResult.awayScore}` : "- -"}
+          </span>
+          {matchResult && (
+            <span style={{ fontSize: 12, color: "#8892a4" }}>
+              {matchResult.yellows != null && `🟨 ${matchResult.yellows}`}
+              {matchResult.yellows != null && matchResult.reds != null && "  "}
+              {matchResult.reds != null && `🟥 ${matchResult.reds}`}
+            </span>
+          )}
+        </div>
         <span style={{ fontSize: 15, fontWeight: 700, textAlign: "left", flex: 1 }}>{match.away} {flag(match.away)}</span>
       </div>
 
@@ -263,7 +270,9 @@ function FeaturedMatchCard({ groupCode, result, tz, serverNow = Date.now() }) {
               <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{p.name}</span>
               {p.pick ? (
                 <span style={{ fontSize: 13, color: "#e8eaf0", fontWeight: 700, background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, padding: "3px 10px" }}>
-                  {flag(match.home)} {p.pick.homeScore} – {p.pick.awayScore} {flag(match.away)}
+                  {flag(match.home)} {p.pick.homeScore} - {p.pick.awayScore} {flag(match.away)}
+                  {p.pick.yellows != null && <span style={{ marginLeft: 6, fontWeight: 400, color: "#8892a4" }}>🟨{p.pick.yellows}</span>}
+                  {p.pick.reds != null && <span style={{ marginLeft: 4, fontWeight: 400, color: "#8892a4" }}>🟥{p.pick.reds}</span>}
                 </span>
               ) : (
                 <span style={{ fontSize: 12, color: "#3a4050", fontStyle: "italic" }}>no pick</span>
@@ -576,8 +585,8 @@ export default function App() {
           <p style={{ color: "#8892a4", fontSize: 13, marginBottom: 24 }}>Get your group code from the Gaffer.</p>
           <div style={S.card}>
             {[["Group Code", joinCode, v => setJoinCode(v.toUpperCase()), "GP-ABC12", "text"],
-              ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
-              ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
+            ["Your Name", joinName, setJoinName, "Leaderboard name", "text"],
+            ["4-digit PIN", joinPin, v => setJoinPin(v.replace(/\D/, "")), "Pick a PIN", "password"]
             ].map(([lbl, val, set, ph, type]) => (
               <div key={lbl} style={{ marginBottom: 14 }}>
                 <label style={S.label}>{lbl}</label>
@@ -746,41 +755,41 @@ export default function App() {
           {Object.entries(leaderboards)
             .filter(([code]) => !adminMode || code === adminLbGroup)
             .map(([code, data]) => {
-            const board = data.board || [];
-            const groupName = data.groupName || code;
-            return (
-            <div key={code}>
-              {/* Featured match card per group */}
-              <FeaturedMatchCard
-                groupCode={code}
-                result={(() => { const f = getFeaturedMatch(serverNow); return f ? results[f.match.id] : null; })()}
-                tz={tz}
-                serverNow={serverNow}
-              />
-              <div style={{ ...S.card, marginBottom: 20 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                  <span style={{ fontWeight: 700, fontSize: 16 }}>{groupName}</span>
-                  <span style={S.badge("yellow")}>{code}</span>
-                </div>
-                {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
-                {board.map((p, i) => {
-                  const prevTotal = i > 0 ? board[i - 1].total : null;
-                  const rank = i === 0 ? 1 : board[i].total === prevTotal ? null : i + 1;
-                  const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
-                  const displayRank = medal || `${i + 1}`;
-                  return (
-                    <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
-                      <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: medal ? "#f5c518" : "#8892a4" }}>{displayRank}</span>
-                      <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
-                      <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
-                      <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
+              const board = data.board || [];
+              const groupName = data.groupName || code;
+              return (
+                <div key={code}>
+                  {/* Featured match card per group */}
+                  <FeaturedMatchCard
+                    groupCode={code}
+                    result={(() => { const f = getFeaturedMatch(serverNow); return f ? results[f.match.id] : null; })()}
+                    tz={tz}
+                    serverNow={serverNow}
+                  />
+                  <div style={{ ...S.card, marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                      <span style={{ fontWeight: 700, fontSize: 16 }}>{groupName}</span>
+                      <span style={S.badge("yellow")}>{code}</span>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-            );
-          })}
+                    {board.length === 0 && <div style={{ color: "#8892a4", fontSize: 13 }}>No picks yet.</div>}
+                    {board.map((p, i) => {
+                      const prevTotal = i > 0 ? board[i - 1].total : null;
+                      const rank = i === 0 ? 1 : board[i].total === prevTotal ? null : i + 1;
+                      const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
+                      const displayRank = medal || `${i + 1}`;
+                      return (
+                        <div key={p.name} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #1a1e2a", gap: 10 }}>
+                          <span style={{ width: 24, fontSize: 13, fontWeight: 800, color: medal ? "#f5c518" : "#8892a4" }}>{displayRank}</span>
+                          <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{p.name}</span>
+                          <span style={{ fontSize: 12, color: "#8892a4" }}>{p.predicted} picked</span>
+                          <span style={S.ptsBadge(p.total)}>{p.total} pts</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
         </div>
       )}
     </div>
@@ -830,7 +839,7 @@ function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast }) {
       <div style={S.matchRow}>
         <span style={S.teamName}>{flag(match.home)} {match.home}</span>
         <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
-        <span style={S.vs}>–</span>
+        <span style={S.vs}>-</span>
         <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         <span style={S.teamName}>{flag(match.away)} {match.away}</span>
       </div>
@@ -851,7 +860,7 @@ function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast }) {
       </div>
       {result && (
         <div style={{ marginTop: 8, fontSize: 12, color: "#8892a4", borderTop: "1px solid #1a1e2a", paddingTop: 8 }}>
-          Result: <strong style={{ color: "#e8eaf0" }}>{match.home} {result.homeScore}–{result.awayScore} {match.away}</strong>
+          Result: <strong style={{ color: "#e8eaf0" }}>{match.home} {result.homeScore}-{result.awayScore} {match.away}</strong>
           {result.yellows != null && <> · 🟨 {result.yellows}</>}
           {result.reds != null && <> · 🟥 {result.reds}</>}
         </div>
@@ -888,7 +897,7 @@ function AdminMatchRow({ match, result, tz, onSave }) {
       <div style={S.matchRow}>
         <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.home)} {match.home}</span>
         <input style={S.inputSm} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
-        <span style={S.vs}>–</span>
+        <span style={S.vs}>-</span>
         <input style={S.inputSm} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
         <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.away)} {match.away}</span>
       </div>

@@ -474,7 +474,7 @@ function calcPoints(pred, result) {
 	if (predResult === realResult) pts += 3;
 	if (ph === rh) pts += 2;
 	if (pa === ra) pts += 2;
-	if (ph - pa === rh - ra) pts += 1;
+	if ((ph - pa) === (rh - ra)) pts += 1; // correct goal difference
 	// if (ph !== rh || pa !== ra) {
 
 	// }
