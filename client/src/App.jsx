@@ -276,7 +276,7 @@ function FeaturedMatchCard({ groupCode, result, tz, serverNow = Date.now() }) {
         {loadingPicks && <div style={{ color: "#8892a4", fontSize: 12 }}>Loading…</div>}
         {!loadingPicks && playerPicks.map(p => {
           const pts = p.pick && matchResult ? calcPoints(
-            { homeScore: p.pick.homeScore, awayScore: p.pick.awayScore },
+            { homeScore: p.pick.homeScore, awayScore: p.pick.awayScore, yellows: p.pick.yellows, reds: p.pick.reds },
             matchResult
           ) : null;
           return (
