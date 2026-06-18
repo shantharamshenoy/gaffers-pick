@@ -385,7 +385,7 @@ app.get("/api/leaderboard/:groupCode/match/:matchId", async (req, res) => {
 			return {
 				name: p.name,
 				pick: pk
-					? { homeScore: pk.home_score, awayScore: pk.away_score }
+					? { homeScore: pk.home_score, awayScore: pk.away_score, yellows: pk.yellows, reds: pk.reds }
 					: null,
 			};
 		});
