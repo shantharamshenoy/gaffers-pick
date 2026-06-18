@@ -83,7 +83,7 @@ async function checkAdminPassword(input) {
 
 const FLAGS = {
   "Mexico": "mx", "South Africa": "za", "South Korea": "kr", "Czechia": "cz",
-  "Canada": "ca", "Bosnia-Herzegovina": "ba", "Qatar": "qa", "Switzerland": "ch",
+  "Canada": "ca", "Bosnia and Herzegovina": "ba", "Qatar": "qa", "Switzerland": "ch",
   "Brazil": "br", "Morocco": "ma", "Haiti": "ht", "Scotland": "gb-sct",
   "USA": "us", "Paraguay": "py", "Australia": "au", "Türkiye": "tr",
   "Germany": "de", "Curaçao": "cw", "Ivory Coast": "ci", "Ecuador": "ec",
