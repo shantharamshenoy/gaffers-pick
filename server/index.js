@@ -55,6 +55,16 @@ async function initDb() {
       reds INT,
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+	CREATE TABLE IF NOT EXISTS cards (
+		id SERIAL PRIMARY KEY,
+		group_code TEXT NOT NULL,
+		player_name TEXT NOT NULL,
+		match_id TEXT NOT NULL,
+		played_at TIMESTAMPTZ DEFAULT NOW(),
+		UNIQUE(group_code, player_name, match_id)
+	);
+
   `);
 	console.log("DB tables ready");
 }
@@ -303,96 +313,171 @@ app.get("/api/picks/:groupCode/:playerName", async (req, res) => {
 });
 
 // Leaderboard for a group
+// app.get("/api/leaderboard/:groupCode", async (req, res) => {
+// 	try {
+// 		const { rows: groupRows } = await pool.query(
+// 			"SELECT name FROM groups WHERE code=$1",
+// 			[req.params.groupCode],
+// 		);
+// 		const groupName = groupRows[0]?.name || req.params.groupCode;
+
+// 		const { rows: players } = await pool.query(
+// 			"SELECT name FROM players WHERE group_code=$1",
+// 			[req.params.groupCode],
+// 		);
+// 		const { rows: picks } = await pool.query(
+// 			"SELECT * FROM picks WHERE group_code=$1",
+// 			[req.params.groupCode],
+// 		);
+// 		const { rows: results } = await pool.query("SELECT * FROM results");
+
+// 		const resultMap = {};
+// 		results.forEach((r) => {
+// 			resultMap[r.match_id] = {
+// 				homeScore: r.home_score,
+// 				awayScore: r.away_score,
+// 				yellows: r.yellows,
+// 				reds: r.reds,
+// 			};
+// 		});
+
+// 		const board = players
+// 			.map((p) => {
+// 				const playerPicks = picks.filter(
+// 					(pk) => pk.player_name.toLowerCase() === p.name.toLowerCase(),
+// 				);
+// 				let total = 0,
+// 					predicted = 0;
+// 				playerPicks.forEach((pk) => {
+// 					predicted++;
+// 					const result = resultMap[pk.match_id];
+// 					if (result) {
+// 						total += calcPoints(
+// 							{
+// 								homeScore: pk.home_score,
+// 								awayScore: pk.away_score,
+// 								yellows: pk.yellows,
+// 								reds: pk.reds,
+// 							},
+// 							result,
+// 						);
+// 					}
+// 				});
+// 				return { name: p.name, total, predicted };
+// 			})
+// 			.sort((a, b) => b.total - a.total);
+
+// 		res.json({ groupName, board });
+// 	} catch (e) {
+// 		res.status(500).json({ error: e.message });
+// 	}
+// });
+
 app.get("/api/leaderboard/:groupCode", async (req, res) => {
-	try {
-		const { rows: groupRows } = await pool.query(
-			"SELECT name FROM groups WHERE code=$1",
-			[req.params.groupCode],
-		);
-		const groupName = groupRows[0]?.name || req.params.groupCode;
+  try {
+    const { rows: groupRows } = await pool.query("SELECT name FROM groups WHERE code=$1", [req.params.groupCode]);
+    const groupName = groupRows[0]?.name || req.params.groupCode;
+    const { rows: players } = await pool.query("SELECT name FROM players WHERE group_code=$1", [req.params.groupCode]);
+    const { rows: picks } = await pool.query("SELECT * FROM picks WHERE group_code=$1", [req.params.groupCode]);
+    const { rows: results } = await pool.query("SELECT * FROM results");
+    const { rows: cards } = await pool.query("SELECT player_name, match_id FROM cards WHERE group_code=$1", [req.params.groupCode]);
 
-		const { rows: players } = await pool.query(
-			"SELECT name FROM players WHERE group_code=$1",
-			[req.params.groupCode],
-		);
-		const { rows: picks } = await pool.query(
-			"SELECT * FROM picks WHERE group_code=$1",
-			[req.params.groupCode],
-		);
-		const { rows: results } = await pool.query("SELECT * FROM results");
+    const resultMap = {};
+    results.forEach(r => {
+      resultMap[r.match_id] = { homeScore: r.home_score, awayScore: r.away_score, yellows: r.yellows, reds: r.reds };
+    });
 
-		const resultMap = {};
-		results.forEach((r) => {
-			resultMap[r.match_id] = {
-				homeScore: r.home_score,
-				awayScore: r.away_score,
-				yellows: r.yellows,
-				reds: r.reds,
-			};
-		});
+    const cardSet = new Set(cards.map(c => `${c.player_name.toLowerCase()}:${c.match_id}`));
 
-		const board = players
-			.map((p) => {
-				const playerPicks = picks.filter(
-					(pk) => pk.player_name.toLowerCase() === p.name.toLowerCase(),
-				);
-				let total = 0,
-					predicted = 0;
-				playerPicks.forEach((pk) => {
-					predicted++;
-					const result = resultMap[pk.match_id];
-					if (result) {
-						total += calcPoints(
-							{
-								homeScore: pk.home_score,
-								awayScore: pk.away_score,
-								yellows: pk.yellows,
-								reds: pk.reds,
-							},
-							result,
-						);
-					}
-				});
-				return { name: p.name, total, predicted };
-			})
-			.sort((a, b) => b.total - a.total);
+    const board = players.map(p => {
+      const playerPicks = picks.filter(pk => pk.player_name.toLowerCase() === p.name.toLowerCase());
+      let total = 0, predicted = 0;
+      playerPicks.forEach(pk => {
+        predicted++;
+        const result = resultMap[pk.match_id];
+        if (result) {
+          const cardPlayed = cardSet.has(`${p.name.toLowerCase()}:${pk.match_id}`);
+          total += calcPoints(
+            { homeScore: pk.home_score, awayScore: pk.away_score, yellows: pk.yellows, reds: pk.reds },
+            result,
+            cardPlayed
+          );
+        }
+      });
+      return { name: p.name, total, predicted };
+    }).sort((a, b) => b.total - a.total);
 
-		res.json({ groupName, board });
-	} catch (e) {
-		res.status(500).json({ error: e.message });
-	}
+    res.json({ groupName, board });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Featured match picks for a group
-app.get("/api/leaderboard/:groupCode/match/:matchId", async (req, res) => {
-	const { groupCode, matchId } = req.params;
-	try {
-		const { rows: players } = await pool.query(
-			"SELECT name FROM players WHERE group_code=$1",
-			[groupCode],
-		);
-		const { rows: picks } = await pool.query(
-			"SELECT player_name, home_score, away_score, yellows, reds FROM picks WHERE group_code=$1 AND match_id=$2",
-			[groupCode, matchId],
-		);
-		const pickMap = {};
-		picks.forEach((p) => {
-			pickMap[p.player_name.toLowerCase()] = p;
-		});
+// app.get("/api/leaderboard/:groupCode/match/:matchId", async (req, res) => {
+// 	const { groupCode, matchId } = req.params;
+// 	try {
+// 		const { rows: players } = await pool.query(
+// 			"SELECT name FROM players WHERE group_code=$1",
+// 			[groupCode],
+// 		);
+// 		const { rows: picks } = await pool.query(
+// 			"SELECT player_name, home_score, away_score, yellows, reds FROM picks WHERE group_code=$1 AND match_id=$2",
+// 			[groupCode, matchId],
+// 		);
+// 		const pickMap = {};
+// 		picks.forEach((p) => {
+// 			pickMap[p.player_name.toLowerCase()] = p;
+// 		});
 
-		const result = players.map((p) => {
-			const pk = pickMap[p.name.toLowerCase()];
-			return {
-				name: p.name,
-				pick: pk
-					? { homeScore: pk.home_score, awayScore: pk.away_score, yellows: pk.yellows, reds: pk.reds }
-					: null,
-			};
-		});
-		res.json(result);
-	} catch (e) {
-		res.status(500).json({ error: e.message });
-	}
+// 		const result = players.map((p) => {
+// 			const pk = pickMap[p.name.toLowerCase()];
+// 			return {
+// 				name: p.name,
+// 				pick: pk
+// 					? {
+// 							homeScore: pk.home_score,
+// 							awayScore: pk.away_score,
+// 							yellows: pk.yellows,
+// 							reds: pk.reds,
+// 						}
+// 					: null,
+// 			};
+// 		});
+// 		res.json(result);
+// 	} catch (e) {
+// 		res.status(500).json({ error: e.message });
+// 	}
+// });
+
+app.get("/api/leaderboard/:groupCode/match/:matchId", async (req, res) => {
+  const { groupCode, matchId } = req.params;
+  try {
+    const { rows: players } = await pool.query("SELECT name FROM players WHERE group_code=$1", [groupCode]);
+    const { rows: picks } = await pool.query(
+      "SELECT player_name, home_score, away_score, yellows, reds FROM picks WHERE group_code=$1 AND match_id=$2",
+      [groupCode, matchId]
+    );
+    const { rows: cards } = await pool.query(
+      "SELECT player_name FROM cards WHERE group_code=$1 AND match_id=$2",
+      [groupCode, matchId]
+    );
+    const pickMap = {};
+    picks.forEach(p => { pickMap[p.player_name.toLowerCase()] = p; });
+    const cardSet = new Set(cards.map(c => c.player_name.toLowerCase()));
+
+    const result = players.map(p => {
+      const pk = pickMap[p.name.toLowerCase()];
+      return {
+        name: p.name,
+        pick: pk ? { homeScore: pk.home_score, awayScore: pk.away_score, yellows: pk.yellows, reds: pk.reds } : null,
+        cardPlayed: cardSet.has(p.name.toLowerCase())
+      };
+    });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Return flow: validate existing player, suggest close matches, never create
@@ -460,38 +545,128 @@ app.get("/api/groups/:code/player/:name", async (req, res) => {
 	}
 });
 
-// ─── SCORING (server-side) ────────────────────────────────────────────────────
-function calcPoints(pred, result) {
-	if (!pred || !result) return 0;
-	const ph = parseInt(pred.homeScore),
-		pa = parseInt(pred.awayScore);
-	const rh = parseInt(result.homeScore),
-		ra = parseInt(result.awayScore);
-	if (isNaN(ph) || isNaN(pa) || isNaN(rh) || isNaN(ra)) return 0;
-	let pts = 0;
-	const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
-	const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
-	if (predResult === realResult) pts += 3;
-	if (ph === rh) pts += 2;
-	if (pa === ra) pts += 2;
-	if ((ph - pa) === (rh - ra)) pts += 1; // correct goal difference
-	// if (ph !== rh || pa !== ra) {
+// Play a card
+app.post("/api/cards", async (req, res) => {
+  const { groupCode, playerName, pin, matchId } = req.body;
+  try {
+    // Verify PIN
+    const { rows } = await pool.query(
+      "SELECT pin FROM players WHERE group_code=$1 AND LOWER(name)=LOWER($2)",
+      [groupCode, playerName]
+    );
+    if (!rows.length || rows[0].pin !== pin) return res.status(401).json({ error: "Invalid PIN" });
 
-	// }
-	if (
-		pred.yellows != null &&
-		result.yellows != null &&
-		parseInt(pred.yellows) === parseInt(result.yellows)
-	)
-		pts += 1;
-	if (
-		pred.reds != null &&
-		result.reds != null &&
-		parseInt(pred.reds) === parseInt(result.reds)
-	)
-		pts += 1;
-	return pts;
+    // Check card window — kickoff + 50 mins
+    const match = MATCHES.find(m => m.id === matchId);
+    if (!match) return res.status(404).json({ error: "Match not found" });
+    const windowClose = new Date(match.kickoff).getTime() + 50 * 60 * 1000;
+    if (Date.now() > windowClose) return res.status(403).json({ error: "Card window closed." });
+    if (Date.now() < new Date(match.kickoff).getTime()) return res.status(403).json({ error: "Match hasn't started yet." });
+
+    // Check cards remaining (3 max per player per group)
+    const { rows: used } = await pool.query(
+      "SELECT COUNT(*) FROM cards WHERE group_code=$1 AND LOWER(player_name)=LOWER($2)",
+      [groupCode, playerName]
+    );
+    if (parseInt(used[0].count) >= 3) return res.status(400).json({ error: "No cards remaining." });
+
+    // Play the card
+    await pool.query(
+      "INSERT INTO cards (group_code, player_name, match_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+      [groupCode, playerName, matchId]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Get cards for a player
+app.get("/api/cards/:groupCode/:playerName", async (req, res) => {
+  const { groupCode, playerName } = req.params;
+  try {
+    const { rows } = await pool.query(
+      "SELECT match_id FROM cards WHERE group_code=$1 AND LOWER(player_name)=LOWER($2)",
+      [groupCode, playerName]
+    );
+    res.json({ used: rows.map(r => r.match_id), remaining: 3 - rows.length });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Get all cards for a group (for leaderboard/featured card display)
+app.get("/api/cards/:groupCode", async (req, res) => {
+  const { groupCode } = req.params;
+  try {
+    const { rows } = await pool.query(
+      "SELECT player_name, match_id FROM cards WHERE group_code=$1",
+      [groupCode]
+    );
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─── SCORING (server-side) ────────────────────────────────────────────────────
+function calcPoints(pred, result, cardPlayed = false) {
+  if (!pred || !result) return 0;
+  const ph = parseInt(pred.homeScore), pa = parseInt(pred.awayScore);
+  const rh = parseInt(result.homeScore), ra = parseInt(result.awayScore);
+  if (isNaN(ph) || isNaN(pa) || isNaN(rh) || isNaN(ra)) return 0;
+  
+  const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
+  const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
+  const correctResult = predResult === realResult;
+
+  // Card played — correct result doubles all points, wrong result = 0
+  if (cardPlayed) {
+    if (!correctResult) return 0;
+  }
+
+  let pts = 0;
+  if (correctResult) pts += 3;
+  if (ph === rh) pts += 2;
+  if (pa === ra) pts += 2;
+  if ((ph - pa) === (rh - ra)) pts += 1;
+  if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1;
+  if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1;
+
+  return cardPlayed ? pts * 2 : pts;
 }
+
+// function calcPoints(pred, result) {
+// 	if (!pred || !result) return 0;
+// 	const ph = parseInt(pred.homeScore),
+// 		pa = parseInt(pred.awayScore);
+// 	const rh = parseInt(result.homeScore),
+// 		ra = parseInt(result.awayScore);
+// 	if (isNaN(ph) || isNaN(pa) || isNaN(rh) || isNaN(ra)) return 0;
+// 	let pts = 0;
+// 	const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
+// 	const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
+// 	if (predResult === realResult) pts += 3;
+// 	if (ph === rh) pts += 2;
+// 	if (pa === ra) pts += 2;
+// 	if (ph - pa === rh - ra) pts += 1; // correct goal difference
+// 	// if (ph !== rh || pa !== ra) {
+
+// 	// }
+// 	if (
+// 		pred.yellows != null &&
+// 		result.yellows != null &&
+// 		parseInt(pred.yellows) === parseInt(result.yellows)
+// 	)
+// 		pts += 1;
+// 	if (
+// 		pred.reds != null &&
+// 		result.reds != null &&
+// 		parseInt(pred.reds) === parseInt(result.reds)
+// 	)
+// 		pts += 1;
+// 	return pts;
+// }
 
 // ─── SPA FALLBACK ─────────────────────────────────────────────────────────────
 app.get("*", (req, res) => {

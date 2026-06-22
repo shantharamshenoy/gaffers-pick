@@ -4,21 +4,40 @@ import { GROUPS, MATCHES } from "./matchData";
 const LOCK_MINUTES = 30;
 const MATCH_DURATION_MS = 150 * 60 * 1000; // 150 min covers ET + pens buffer
 
-function calcPoints(pred, result) {
+// function calcPoints(pred, result) {
+//   if (!pred || !result) return 0;
+//   const ph = parseInt(pred.homeScore), pa = parseInt(pred.awayScore);
+//   const rh = parseInt(result.homeScore), ra = parseInt(result.awayScore);
+//   if (isNaN(ph) || isNaN(pa) || isNaN(rh) || isNaN(ra)) return 0;
+//   let pts = 0;
+//   const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
+//   const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
+//   if (predResult === realResult) pts += 3; // exact score
+//   if (ph === rh) pts += 2; // correct home score
+//   if (pa === ra) pts += 2; // correct away score
+//   if ((ph - pa) === (rh - ra)) pts += 1; // correct goal difference
+//   if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1; // correct yellow card count
+//   if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1; // correct red card count
+//   return pts;
+// }
+
+function calcPoints(pred, result, cardPlayed = false) {
   if (!pred || !result) return 0;
   const ph = parseInt(pred.homeScore), pa = parseInt(pred.awayScore);
   const rh = parseInt(result.homeScore), ra = parseInt(result.awayScore);
   if (isNaN(ph) || isNaN(pa) || isNaN(rh) || isNaN(ra)) return 0;
-  let pts = 0;
   const predResult = ph > pa ? "H" : ph < pa ? "A" : "D";
   const realResult = rh > ra ? "H" : rh < ra ? "A" : "D";
-  if (predResult === realResult) pts += 3; // exact score
-  if (ph === rh) pts += 2; // correct home score
-  if (pa === ra) pts += 2; // correct away score
-  if ((ph - pa) === (rh - ra)) pts += 1; // correct goal difference
-  if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1; // correct yellow card count
-  if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1; // correct red card count
-  return pts;
+  const correctResult = predResult === realResult;
+  if (cardPlayed && !correctResult) return 0;
+  let pts = 0;
+  if (correctResult) pts += 3;
+  if (ph === rh) pts += 2;
+  if (pa === ra) pts += 2;
+  if ((ph - pa) === (rh - ra)) pts += 1;
+  if (pred.yellows != null && result.yellows != null && parseInt(pred.yellows) === parseInt(result.yellows)) pts += 1;
+  if (pred.reds != null && result.reds != null && parseInt(pred.reds) === parseInt(result.reds)) pts += 1;
+  return cardPlayed ? pts * 2 : pts;
 }
 
 function isLocked(kickoff, now = Date.now()) {
@@ -277,11 +296,15 @@ function FeaturedMatchCard({ groupCode, result, tz, serverNow = Date.now() }) {
         {!loadingPicks && playerPicks.map(p => {
           const pts = p.pick && matchResult ? calcPoints(
             { homeScore: p.pick.homeScore, awayScore: p.pick.awayScore, yellows: p.pick.yellows, reds: p.pick.reds },
-            matchResult
+            matchResult,
+            p.cardPlayed
           ) : null;
           return (
             <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", borderBottom: "1px solid #0d1117" }}>
-              <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{p.name}</span>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>
+                {p.name}
+                {p.cardPlayed && <span style={{ marginLeft: 6, fontSize: 11 }}>🃏</span>}
+              </span>
               {p.pick ? (
                 <span style={{ fontSize: 13, color: "#e8eaf0", fontWeight: 700, background: "#0d1117", border: "1px solid #2a3040", borderRadius: 6, padding: "3px 10px" }}>
                   {flag(match.home)} {p.pick.homeScore} - {p.pick.awayScore} {flag(match.away)}
@@ -330,7 +353,7 @@ export default function App() {
   const [returnSuggestion, setReturnSuggestion] = useState(null);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [autoLoginChecked, setAutoLoginChecked] = useState(false);
-
+  const [cards, setCards] = useState({ used: [], remaining: 3 });
 
   useEffect(() => {
     try { setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { }
@@ -360,6 +383,8 @@ export default function App() {
             if (res.ok) {
               const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(name)}?pin=${pin}`);
               if (pRes.ok) setPicks(await pRes.json());
+              const cRes = await fetch(`/api/cards/${code}/${encodeURIComponent(name)}`);
+              if (cRes.ok) setCards(await cRes.json());
               setCurrentPlayer({ name, pin, groupCode: code, groupName: data.group.name });
               setScreen("predict");
             } else {
@@ -421,6 +446,8 @@ export default function App() {
       if (!res.ok) { setJoinError(data.error || "Something went wrong."); setLoading(false); return; }
       const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(name)}?pin=${pin}`);
       if (pRes.ok) setPicks(await pRes.json());
+      const cRes = await fetch(`/api/cards/${code}/${encodeURIComponent(name)}`);
+      if (cRes.ok) setCards(await cRes.json());
       setCurrentPlayer({ name, pin, groupCode: code, groupName: data.group.name });
       if (keepSignedIn) {
         localStorage.setItem("gaffersPickSession", JSON.stringify({ code, name, pin }));
@@ -458,6 +485,8 @@ export default function App() {
 
       const pRes = await fetch(`/api/picks/${code}/${encodeURIComponent(data.exactName)}?pin=${pin}`);
       if (pRes.ok) setPicks(await pRes.json());
+      const cRes = await fetch(`/api/cards/${code}/${encodeURIComponent(data.exactName)}`);
+      if (cRes.ok) setCards(await cRes.json());
       setCurrentPlayer({ name: data.exactName, pin, groupCode: code, groupName: joinData.group.name });
       if (keepSignedIn) {
         localStorage.setItem("gaffersPickSession", JSON.stringify({ code, name: data.exactName, pin }));
@@ -496,6 +525,30 @@ export default function App() {
         setNewGroupName("");
         fetchAdminGroups();
       }
+    } catch { showToast("Network error.", "warn"); }
+  }
+
+  async function playCard(matchId) {
+    if (!currentPlayer) return;
+    const match = MATCHES.find(m => m.id === matchId);
+    if (!match) return;
+    const now = serverNow;
+    const ko = new Date(match.kickoff).getTime();
+    const windowClose = ko + 50 * 60 * 1000;
+    if (now < ko) { showToast("Match hasn't started yet.", "warn"); return; }
+    if (now > windowClose) { showToast("Card window closed — first 50 mins only.", "warn"); return; }
+    if (cards.remaining <= 0) { showToast("No cards remaining.", "warn"); return; }
+    if (cards.used.includes(matchId)) { showToast("Card already played on this match.", "warn"); return; }
+    try {
+      const res = await fetch("/api/cards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupCode: currentPlayer.groupCode, playerName: currentPlayer.name, pin: currentPlayer.pin, matchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error || "Failed to play card.", "warn"); return; }
+      setCards(prev => ({ used: [...prev.used, matchId], remaining: prev.remaining - 1 }));
+      showToast("🃏 Double or Nothing card played!", "success");
     } catch { showToast("Network error.", "warn"); }
   }
 
@@ -715,12 +768,17 @@ export default function App() {
         <div style={S.section}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
             <h2 style={{ fontFamily: "'Georgia',serif", fontSize: 20, margin: 0 }}>Your Picks — {currentPlayer.groupName}</h2>
-            <span style={{ fontSize: 12, color: "#8892a4" }}>Locked 30 min before kickoff</span>
+            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <span style={{ fontSize: 12, color: "#8892a4" }}>Locked 30 min before kickoff</span>
+              <span style={{ background: "#2a2200", border: "1px solid #5a4400", borderRadius: 6, padding: "3px 10px", fontSize: 12, fontWeight: 700, color: "#f5c518" }}>
+                🃏 {cards.remaining}/3 cards remaining
+              </span>
+            </div>
           </div>
           <GroupFilter value={groupFilter} onChange={setGroupFilter} />
           {renderMatchesWithCompletedSection({
             matches: MATCHES, results, tz, groupFilter,
-            renderRow: (m) => <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} serverNow={serverNow} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} />,
+            renderRow: (m) => <PredictRow key={m.id} match={m} pick={picks[m.id]} result={results[m.id]} tz={tz} serverNow={serverNow} onSave={(pred) => savePick(m.id, pred)} showToast={showToast} cardPlayed={cards.used.includes(m.id)} cardsRemaining={cards.remaining} onPlayCard={() => playCard(m.id)} />,
             collapsed: picksCompletedCollapsed,
             onToggle: () => setPicksCompletedCollapsed(c => !c)
           })}
@@ -811,7 +869,7 @@ export default function App() {
 }
 
 // ─── PREDICT ROW ──────────────────────────────────────────────────────────────
-function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast }) {
+function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast, cardPlayed, cardsRemaining, onPlayCard }) {
   const locked = isLocked(match.kickoff, serverNow);
   const [h, setH] = useState(pick?.homeScore ?? "");
   const [a, setA] = useState(pick?.awayScore ?? "");
@@ -852,25 +910,41 @@ function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast }) {
       </div>
       <div style={S.matchRow}>
         <span style={S.teamName}>{flag(match.home)} {match.home}</span>
-        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         <span style={S.vs}>-</span>
-        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+        <input style={{ ...S.inputSm, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         <span style={S.teamName}>{flag(match.away)} {match.away}</span>
       </div>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟨</span>
-          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={y} onChange={e => setY(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={y} onChange={e => setY(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟥</span>
-          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={r} onChange={e => setR(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44, background: locked ? "#0a0c10" : "#0d1117" }} disabled={locked} value={r} onChange={e => setR(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         </div>
-        {!locked && (
-          <button style={{ ...S.btn("sm"), marginLeft: "auto", background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave} disabled={saving}>
-            {saving ? "Saving…" : saved ? "✓ Saved" : "Save Pick"}
-          </button>
-        )}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+          {!locked && (
+            <button style={{ ...S.btn("sm"), background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave} disabled={saving}>
+              {saving ? "Saving…" : saved ? "✓ Saved" : "Save Pick"}
+            </button>
+          )}
+          {(() => {
+            const ko = new Date(match.kickoff).getTime();
+            const windowClose = ko + 50 * 60 * 1000;
+            const inWindow = serverNow >= ko && serverNow <= windowClose;
+            if (cardPlayed) return (
+              <span style={{ ...S.badge("yellow"), fontSize: 12, padding: "4px 10px" }}>🃏 Card Played</span>
+            );
+            if (inWindow && cardsRemaining > 0) return (
+              <button style={{ ...S.btn("sm"), background: "#2a2200", border: "1px solid #5a4400", color: "#f5c518" }} onClick={onPlayCard}>
+                🃏 Play Card
+              </button>
+            );
+            return null;
+          })()}
+        </div>
       </div>
       {result && (
         <div style={{ marginTop: 8, fontSize: 12, color: "#8892a4", borderTop: "1px solid #1a1e2a", paddingTop: 8 }}>
@@ -910,19 +984,19 @@ function AdminMatchRow({ match, result, tz, onSave }) {
       <div style={{ fontSize: 11, color: "#8892a4", marginBottom: 6 }}>{formatKickoff(match.kickoff, tz)} · {match.id}</div>
       <div style={S.matchRow}>
         <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.home)} {match.home}</span>
-        <input style={S.inputSm} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+        <input style={S.inputSm} value={h} onChange={e => setH(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         <span style={S.vs}>-</span>
-        <input style={S.inputSm} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+        <input style={S.inputSm} value={a} onChange={e => setA(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         <span style={{ ...S.teamName, fontSize: 12 }}>{flag(match.away)} {match.away}</span>
       </div>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 8, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟨</span>
-          <input style={{ ...S.inputSm, width: 44 }} value={y} onChange={e => setY(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44 }} value={y} onChange={e => setY(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: "#8892a4" }}>🟥</span>
-          <input style={{ ...S.inputSm, width: 44 }} value={r} onChange={e => setR(e.target.value.replace(/\D/, ""))} placeholder="0" maxLength={2} />
+          <input style={{ ...S.inputSm, width: 44 }} value={r} onChange={e => setR(e.target.value.replace(/\D/, ""))} placeholder="-" maxLength={2} />
         </div>
         <button style={{ ...S.btn("sm"), marginLeft: "auto", background: saved ? "#0d2818" : "#f5c518", color: saved ? "#2ecc71" : "#0a0c10" }} onClick={handleSave}>
           {saved ? "✓ Saved" : "Save Result"}
