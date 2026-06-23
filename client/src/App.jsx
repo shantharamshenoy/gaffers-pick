@@ -534,9 +534,9 @@ export default function App() {
     if (!match) return;
     const now = serverNow;
     const ko = new Date(match.kickoff).getTime();
-    const windowClose = ko + 50 * 60 * 1000;
+    const windowClose = ko + 60 * 60 * 1000;
     if (now < ko) { showToast("Match hasn't started yet.", "warn"); return; }
-    if (now > windowClose) { showToast("Card window closed — first 50 mins only.", "warn"); return; }
+    if (now > windowClose) { showToast("Card window closed - first 60 mins after kick-off only.", "warn"); return; }
     if (cards.remaining <= 0) { showToast("No cards remaining.", "warn"); return; }
     if (cards.used.includes(matchId)) { showToast("Card already played on this match.", "warn"); return; }
     try {
@@ -932,7 +932,7 @@ function PredictRow({ match, pick, result, tz, serverNow, onSave, showToast, car
           )}
           {(() => {
             const ko = new Date(match.kickoff).getTime();
-            const windowClose = ko + 50 * 60 * 1000;
+            const windowClose = ko + 60 * 60 * 1000;
             const inWindow = serverNow >= ko && serverNow <= windowClose;
             if (cardPlayed) return (
               <span style={{ ...S.badge("yellow"), fontSize: 12, padding: "4px 10px" }}>🃏 Card Played</span>

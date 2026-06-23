@@ -556,10 +556,10 @@ app.post("/api/cards", async (req, res) => {
     );
     if (!rows.length || rows[0].pin !== pin) return res.status(401).json({ error: "Invalid PIN" });
 
-    // Check card window — kickoff + 50 mins
+    // Check card window — kickoff + 60 mins
     const match = MATCHES.find(m => m.id === matchId);
     if (!match) return res.status(404).json({ error: "Match not found" });
-    const windowClose = new Date(match.kickoff).getTime() + 50 * 60 * 1000;
+    const windowClose = new Date(match.kickoff).getTime() + 60 * 60 * 1000;
     if (Date.now() > windowClose) return res.status(403).json({ error: "Card window closed." });
     if (Date.now() < new Date(match.kickoff).getTime()) return res.status(403).json({ error: "Match hasn't started yet." });
 
