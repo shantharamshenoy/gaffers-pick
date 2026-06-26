@@ -166,7 +166,7 @@ function FeaturedMatchCard({ match, groupCode, result, tz, serverNow = Date.now(
   const isFinishedNow = isFinished(match.kickoff, serverNow);
 
   return (
-    <div style={{ background:"linear-gradient(135deg,#0d1a2a 0%,#111520 100%)", border:`1px solid ${isLiveNow?"#e74c3c":"#2a3856"}`, borderRadius:12, padding:16, minWidth:300, maxWidth:380, flexShrink:0 }}>
+    <div style={{ background:"linear-gradient(135deg,#0d1a2a 0%,#111520 100%)", border:`1px solid ${isLiveNow?"#e74c3c":"#2a3856"}`, borderRadius:12, padding:16 }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           {isLiveNow && (
@@ -214,15 +214,29 @@ function FeaturedMatchCard({ match, groupCode, result, tz, serverNow = Date.now(
 // ─── FEATURED MATCHES CAROUSEL ────────────────────────────────────────────────
 function FeaturedMatchesCarousel({ groupCode, results, tz, serverNow = Date.now() }) {
   const matches = getFeaturedMatches(serverNow, results);
+  const [idx, setIdx] = useState(0);
   if (!matches.length) return null;
+  const match = matches[Math.min(idx, matches.length - 1)];
+  const total = matches.length;
   return (
     <div style={{ marginBottom:20 }}>
       <div style={{ fontSize:11, color:"#8892a4", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Live & Recent</div>
-      <div style={{ display:"flex", gap:12, overflowX:"auto", paddingBottom:8, scrollbarWidth:"thin", scrollbarColor:"#2a3040 transparent" }}>
-        {matches.map(match => (
+      <div style={{ display:"flex", alignItems:"stretch", gap:8 }}>
+        <button onClick={() => setIdx(i => Math.max(0, i-1))} disabled={idx===0}
+          style={{ background:idx===0?"#111520":"#1a2035", border:"1px solid #2a3040", borderRadius:10, color:idx===0?"#2a3040":"#e8eaf0", fontSize:28, fontWeight:700, cursor:idx===0?"default":"pointer", padding:"0 16px", flexShrink:0, lineHeight:1 }}>‹</button>
+        <div style={{ flex:1, minWidth:0 }}>
           <FeaturedMatchCard key={match.id} match={match} groupCode={groupCode} result={results[match.id]} tz={tz} serverNow={serverNow} />
-        ))}
+        </div>
+        <button onClick={() => setIdx(i => Math.min(total-1, i+1))} disabled={idx===total-1}
+          style={{ background:idx===total-1?"#111520":"#1a2035", border:"1px solid #2a3040", borderRadius:10, color:idx===total-1?"#2a3040":"#e8eaf0", fontSize:28, fontWeight:700, cursor:idx===total-1?"default":"pointer", padding:"0 16px", flexShrink:0, lineHeight:1 }}>›</button>
       </div>
+      {total > 1 && (
+        <div style={{ display:"flex", justifyContent:"center", gap:6, marginTop:10 }}>
+          {matches.map((_,i) => (
+            <button key={i} onClick={() => setIdx(i)} style={{ width:i===idx?20:8, height:8, borderRadius:4, border:"none", background:i===idx?"#f5c518":"#2a3040", cursor:"pointer", transition:"all 0.2s", padding:0 }} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
