@@ -87,5 +87,13 @@ const MATCHES = [
   { id: "R32_14", group: "R32", home: "Australia", away: "Egypt",  kickoff: "2026-07-03T18:00:00Z", round: "Round of 32" },
   { id: "R32_15", group: "R32", home: "Argentina", away: "Cape Verde", kickoff: "2026-07-03T22:00:00Z", round: "Round of 32" },
   { id: "R32_16", group: "R32", home: "Colombia", away: "Ghana",  kickoff: "2026-07-04T01:30:00Z", round: "Round of 32" },
+  { id: "R16_1", group: "R16", home: "Canada", away: "Morocco", kickoff: "2026-07-04T17:00:00Z", round: "Round of 16" },
+  { id: "R16_2", group: "R16", home: "Paraguay", away: "France", kickoff: "2026-07-04T21:00:00Z", round: "Round of 16" },
+  { id: "R16_3", group: "R16", home: "Brazil", away: "Norway", kickoff: "2026-07-05T20:00:00Z", round: "Round of 16" },
+  { id: "R16_4", group: "R16", home: "Mexico", away: "England", kickoff: "2026-07-06T00:00:00Z", round: "Round of 16" },
+  { id: "R16_5", group: "R16", home: "Portugal", away: "Spain", kickoff: "2026-07-06T19:00:00Z", round: "Round of 16" },
+  { id: "R16_6", group: "R16", home: "USA", away: "Belgium", kickoff: "2026-07-07T00:00:00Z", round: "Round of 16" },
+  { id: "R16_7", group: "R16", home: "Argentina", away: "Egypt", kickoff: "2026-07-07T16:00:00Z", round: "Round of 16" },
+  { id: "R16_8", group: "R16", home: "Switzerland", away: "Colombia", kickoff: "2026-07-07T20:00:00Z", round: "Round of 16" },
 ];
 module.exports = MATCHES;
