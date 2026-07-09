@@ -110,4 +110,8 @@ export const MATCHES = [
   { id: "R16_6", group: "R16", home: "USA", away: "Belgium", kickoff: "2026-07-07T00:00:00Z", round: "Round of 16" },
   { id: "R16_7", group: "R16", home: "Argentina", away: "Egypt", kickoff: "2026-07-07T16:00:00Z", round: "Round of 16" },
   { id: "R16_8", group: "R16", home: "Switzerland", away: "Colombia", kickoff: "2026-07-07T20:00:00Z", round: "Round of 16" },
+  { id: "Q1", group: "QFL", home: "France", away: "Morocco", kickoff: "2026-07-09T20:00:00Z", round: "Quarterfinal" },
+  { id: "Q2", group: "QFL", home: "Spain", away: "Belgium", kickoff: "2026-07-10T19:00:00Z", round: "Quarterfinal" },
+  { id: "Q3", group: "QFL", home: "Norway", away: "England", kickoff: "2026-07-11T21:00:00Z", round: "Quarterfinal" },
+  { id: "Q4", group: "QFL", home: "Argentina", away: "Switzerland", kickoff: "2026-07-12T01:00:00Z", round: "Quarterfinal" },
 ];
