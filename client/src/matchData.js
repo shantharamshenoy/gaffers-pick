@@ -758,6 +758,20 @@ export const MATCHES = [
 		kickoff: "2026-07-15T19:00:00Z",
 		round: "Semifinal",
 	},
-	// { id: "3P", group: "3PL", home: "TBD", away: "TBD", kickoff: "2026-07-18T19:00:00Z", round: "3rd Place" },
-	// { id: "Fin", group: "FL", home: "TBD", away: "TBD", kickoff: "2026-07-19T19:00:00Z", round: "Final" },
+	{
+		id: "3P",
+		group: "3PL",
+		home: "France",
+		away: "England",
+		kickoff: "2026-07-18T19:00:00Z",
+		round: "3rd Place",
+	},
+	{
+		id: "Fin",
+		group: "FL",
+		home: "Spain",
+		away: "Argentina",
+		kickoff: "2026-07-19T19:00:00Z",
+		round: "Final",
+	},
 ];
